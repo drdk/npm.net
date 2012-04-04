@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Webmatrix_Npm
+﻿namespace Webmatrix_Npm
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
     /// <summary>
     /// Npm reference has a type and URL
     /// </summary>
     internal interface INpmReference
     {
         /// <summary>
-        /// type string
+        /// Gets the reference type
         /// </summary>
         string Type { get; }
 
         /// <summary>
-        /// URL of object
+        /// Gets the reference URL
         /// </summary>
         string Url { get; }
     }

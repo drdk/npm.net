@@ -1,44 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Webmatrix_Npm
+﻿namespace Webmatrix_Npm
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
+    /// <summary>
+    /// NpmPackage has name and optional version
+    /// </summary>
     public class NpmPackage : INpmPackage
     {
-        public string Name { get; set; }
-        public string Version { get; set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NpmPackage" /> class.
+        /// </summary>
+        /// <param name="name">name of package</param>
+        /// <param name="version">version of package</param>
         public NpmPackage(string name, string version)
         {
-            Name = name;
-            Version = version;
+            this.Name = name;
+            this.Version = version;
         }
-    }
 
-    public class NpmSearchResultPackage : INpmSearchResultPackage
-    {
+        /// <summary>
+        /// Gets or sets name of Npm object
+        /// </summary>
         public string Name { get; set; }
-        public string Version { get; set; }
-        public string Description { get; private set; }
-        public string Author { get; private set; }
-        public string[] Keywords { get; private set; }
-        public DateTime Date { get; private set; }
 
-        public NpmSearchResultPackage(string name, 
-                                      string version, 
-                                      string description,
-                                      string author,
-                                      DateTime date,
-                                      string[] keywords)
-        {
-            Name = name;
-            Version = version;
-            Description = description;
-            Author = author;
-            Keywords = keywords;
-            Date = date;
-        }
+        /// <summary>
+        /// Gets or sets version of Npm object if known
+        /// </summary>
+        public string Version { get; set; }
     }
 }

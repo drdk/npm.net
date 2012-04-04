@@ -1,13 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Webmatrix_Npm
+﻿namespace Webmatrix_Npm
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
+    /// <summary>
+    /// The class implements a wrapper for NPM commands
+    /// </summary>
     internal class NpmApi : INpmApi
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="NpmApi" /> class.
+        /// </summary>
+        /// <param name="wd">Working directory for project</param>
+        public NpmApi(string wd)
+        {
+            NpmFactory factory = new NpmFactory();
+            this.Initialize(factory, wd, null);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NpmApi" /> class.
+        /// </summary>
+        /// <param name="wd">Working directory for project</param>
+        /// <param name="registry">URL for remote registry</param>
+        public NpmApi(string wd, string registry)
+        {
+            NpmFactory factory = new NpmFactory();
+            this.Initialize(factory, wd, registry);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NpmApi" /> class.
+        /// The factory controls which NpmClient and NpmSerialize is used.
+        /// </summary>
+        /// <param name="factory">NpmFactory class</param>
+        /// <param name="wd">Working directory for project</param>
+        /// <param name="registry">URL for remote registry</param>
+        public NpmApi(NpmFactory factory, string wd, string registry)
+        {
+            this.Initialize(factory, wd, registry);
+        }
+
+         /// <summary>
+        /// Gets the NPM version string
+        /// </summary>
+        public string NpmVersion { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the Cient being used to execute npm
+        /// </summary>
+        private INpmClient Client { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Serializer used to convert npm output to objects
+        /// </summary>
+        private INpmSerialize Serializer { get; set; }
+
+       /// <summary>
         /// Get npm version. Wraps 'npm --version'
         /// </summary>
         /// <returns>version string</returns>
@@ -15,11 +66,12 @@ namespace Webmatrix_Npm
         {
             string version;
             string err;
-            int rc = Client.Execute("--version", null, out version, out err);
+            int rc = this.Client.Execute("--version", null, out version, out err);
             if (rc == 0)
             {
                 return version.Trim();
             }
+
             // TODO throw exception if unexpected response
             return null;
         }
@@ -52,12 +104,12 @@ namespace Webmatrix_Npm
         {
             string output = null;
             string err;
-            int rc = Client.Execute("search", searchTerms, out output, out err);
-            if (rc == 0 && !String.IsNullOrWhiteSpace(output))
+            int rc = this.Client.Execute("search", searchTerms, out output, out err);
+            if (rc == 0 && !string.IsNullOrWhiteSpace(output))
             {
-                IEnumerable<INpmSearchResultPackage> found = Serializer.FromSearchResult(output);
-                return found;
+                return this.Serializer.FromSearchResult(output);
             }
+
             // TODO throw exception if unexpected response
             return null;
         }
@@ -104,43 +156,11 @@ namespace Webmatrix_Npm
         /// <summary>
         /// Uninstall named package. Wraps 'npm uninstall name'
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">name of package</param>
+        /// <returns>true or false</returns>
         public bool Uninstall(string name)
         {
             return false;
-        }
-
-        /// <summary>
-        /// Constructor taking working directory path
-        /// </summary>
-        /// <param name="wd">working directory for project</param>
-        public NpmApi(string wd)
-        {
-            NpmFactory factory = new NpmFactory();
-            Initialize(factory, wd, null);
-        }
-
-        /// <summary>
-        /// Constructor taking working directory path and remote registry URL
-        /// </summary>
-        /// <param name="wd">working directory for project</param>
-        /// <param name="registry">URL for remote registry</param>
-        public NpmApi(string wd, string registry)
-        {
-            NpmFactory factory = new NpmFactory();
-            Initialize(factory, wd, registry);
-        }
-
-        /// <summary>
-        /// Constructor to customize client and serializer
-        /// </summary>
-        /// <param name="factory">NpmFactory class</param>
-        /// <param name="wd">working directory for project</param>
-        /// <param name="registry">URL for remote registry</param>
-        public NpmApi(NpmFactory factory, string wd, string registry)
-        {
-            Initialize(factory, wd, registry);
         }
 
         /// <summary>
@@ -152,37 +172,23 @@ namespace Webmatrix_Npm
         private void Initialize(NpmFactory factory, string wd, string registry)
         {
             // first get default client
-            Client = factory.GetClient(null);
+            this.Client = factory.GetClient(null);
 
-            NpmVersion = GetInstalledVersion();
+            this.NpmVersion = this.GetInstalledVersion();
+
             // now see if there is a better client
-            Client = factory.GetClient(NpmVersion);
-            Serializer = factory.GetSerialize(NpmVersion);
+            this.Client = factory.GetClient(this.NpmVersion);
+            this.Serializer = factory.GetSerialize(this.NpmVersion);
 
-            if (!String.IsNullOrWhiteSpace(registry))
+            if (!string.IsNullOrWhiteSpace(registry))
             {
-                Client.Registry = registry;
+                this.Client.Registry = registry;
             }
-            if (!String.IsNullOrWhiteSpace(wd))
+
+            if (!string.IsNullOrWhiteSpace(wd))
             {
-                Client.WorkingDirectory = wd;
+                this.Client.WorkingDirectory = wd;
             }
         }
-
-        /// <summary>
-        /// Cient being used to execute npm
-        /// </summary>
-        private INpmClient Client { get; set; }
-
-        /// <summary>
-        /// Serializer used to convert npm output to objects
-        /// </summary>
-        private INpmSerialize Serializer { get; set; }
-
-        /// <summary>
-        /// NPM version string
-        /// </summary>
-        public string NpmVersion { get; private set; }
-
     }
 }

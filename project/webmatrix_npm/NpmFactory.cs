@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Webmatrix_Npm
+﻿namespace Webmatrix_Npm
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     /// <summary>
     /// Factory to return client and serialize objects for current version
     /// </summary>
@@ -14,7 +14,7 @@ namespace Webmatrix_Npm
         /// Get NpmClient to support the version.
         /// </summary>
         /// <param name="version">npm version string or null for default</param>
-        /// <returns>INpmClient</returns>
+        /// <returns>INpmClient instance</returns>
         public virtual INpmClient GetClient(string version)
         {
             return new NpmClient();
@@ -24,7 +24,7 @@ namespace Webmatrix_Npm
         /// GetNpmSerialize to support the version
         /// </summary>
         /// <param name="version">npm version string or null for default</param>
-        /// <returns>INpmSerialize</returns>
+        /// <returns>INpmSerialize instance</returns>
         public virtual INpmSerialize GetSerialize(string version)
         {
             return new NpmSerialize();
