@@ -26,9 +26,9 @@
     internal interface INpmPackageDependency : INpmPackage
     {
         /// <summary>
-        /// Gets the version range of supported dependency
+        /// Gets or sets the version range of supported dependency
         /// </summary>
-        string VersionRange { get; }
+        string VersionRange { get; set; }
     }
 
     /// <summary>
@@ -37,19 +37,19 @@
     internal interface INpmInstalledPackage : INpmPackage
     {
         /// <summary>
-        /// Gets the set of installed dependencies
+        /// Gets or sets the set of installed dependencies
         /// </summary>
-        IEnumerable<INpmInstalledPackage> InstalledDependencies { get; }
+        IEnumerable<INpmInstalledPackage> InstalledDependencies { get; set; }
 
         /// <summary>
-        /// Gets the set of dependencies that are not installed
+        /// Gets or sets the set of dependencies that are not installed
         /// </summary>
-        IEnumerable<INpmPackageDependency> MissingDependencies { get; }
+        IEnumerable<INpmPackageDependency> MissingDependencies { get; set; }
 
         /// <summary>
-        /// Gets the set of dependencies that need to be updated
+        /// Gets or sets the set of dependencies that need to be updated
         /// </summary>
-        IEnumerable<INpmPackageDependency> OutdatedDependencies { get; }
+        IEnumerable<INpmPackageDependency> OutdatedDependencies { get; set; }
     }
 
     /// <summary>
@@ -58,64 +58,64 @@
     internal interface INpmRemotePackage : INpmPackage
     {
         /// <summary>
-        /// Gets the text description
+        /// Gets or sets the text description
         /// </summary>
-        string Description { get; }
+        string Description { get; set; }
 
         /// <summary>
-        /// Gets the published versions
+        /// Gets or sets the published versions
         /// </summary>
-        IEnumerable<string> Versions { get; }
+        IEnumerable<string> Versions { get; set; }
 
         /// <summary>
-        /// Gets the names of maintainers
+        /// Gets or sets the names of maintainers
         /// </summary>
-        IEnumerable<string> Maintainers { get; }
+        IEnumerable<string> Maintainers { get; set; }
 
         /// <summary>
-        /// Gets the names of contributors
+        /// Gets or sets the names of contributors
         /// </summary>
-        IEnumerable<string> Contributors { get; }
+        IEnumerable<string> Contributors { get; set; }
 
         /// <summary>
-        /// Gets the URL for home page of project
+        /// Gets or sets the keywords
         /// </summary>
-        string HomepageUrl { get; }
+        IEnumerable<string> Keywords { get; set; }
 
         /// <summary>
-        /// Gets the author of project
+        /// Gets or sets the URL for home page of project
         /// </summary>
-        string Author { get; }
+        string HomepageUrl { get; set; }
 
         /// <summary>
-        /// Gets the set of files in package
+        /// Gets or sets the author of project
         /// </summary>
-        IEnumerable<string> Files { get; }
+        string Author { get; set; }
 
         /// <summary>
-        /// Gets the set of required dependencies
+        /// Gets or sets the set of required dependencies
         /// </summary>
-        IEnumerable<INpmPackageDependency> Dependencies { get; }
+        IEnumerable<INpmPackageDependency> Dependencies { get; set; }
 
         /// <summary>
-        /// Gets the set of development dependencies
+        /// Gets or sets the set of development dependencies
         /// </summary>
-        IEnumerable<INpmPackageDependency> DevDependencies { get; }
+        IEnumerable<INpmPackageDependency> DevDependencies { get; set; }
 
         /// <summary>
-        /// Gets the set of optional dependencies
+        /// Gets or sets the set of optional dependencies
         /// </summary>
-        IEnumerable<INpmPackageDependency> OptionalDependencies { get; }
+        IEnumerable<INpmPackageDependency> OptionalDependencies { get; set; }
 
         /// <summary>
-        /// Gets the reference to license
+        /// Gets or sets the reference to license
         /// </summary>
-        INpmReference License { get; }
+        INpmReference License { get; set; }
 
         /// <summary>
-        /// Gets the reference to remote repository where it is published
+        /// Gets or sets the reference to remote repository where it is published
         /// </summary>
-        INpmReference Repository { get; }
+        INpmReference Repository { get; set; }
     }
 
     /// <summary>

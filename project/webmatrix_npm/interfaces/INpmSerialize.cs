@@ -15,7 +15,7 @@
         /// </summary>
         /// <param name="jsonlist">text output</param>
         /// <returns>enumarable NpmInstalledPackage properties</returns>
-        IEnumerable<INpmInstalledPackage> FromListInstalled(string jsonlist);
+        INpmInstalledPackage FromListInstalled(string jsonlist);
 
         /// <summary>
         /// convert npm view output to INpmRemotePackage

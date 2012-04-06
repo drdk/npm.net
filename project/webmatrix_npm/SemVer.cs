@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
 
@@ -21,7 +22,7 @@
             this.Major = major;
             this.Minor = minor;
             this.Patch = patch;
-            this.Version = string.Format("{0}.{1}.{2}", major, minor, patch);
+            this.Version = string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}", major, minor, patch);
             this.Build = null;
             this.PreRelease = null;
         }
@@ -44,12 +45,12 @@
             if (isBuild)
             {
                 this.Build = buildOrPrerel;
-                this.Version = string.Format("{0}.{1}.{2}+{3}", major, minor, patch, buildOrPrerel);
+                this.Version = string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}+{3}", major, minor, patch, buildOrPrerel);
             }
             else
             {
                 this.PreRelease = buildOrPrerel;
-                this.Version = string.Format("{0}.{1}.{2}-{3}", major, minor, patch, buildOrPrerel);
+                this.Version = string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}-{3}", major, minor, patch, buildOrPrerel);
             }
         }
 

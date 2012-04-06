@@ -52,7 +52,9 @@
   <ItemGroup>
     <Compile Include="MockNpmClient.cs" />
     <Compile Include="MockNpmFactory.cs" />
+    <Compile Include="MockTestData.cs" />
     <Compile Include="NpmApiTest.cs" />
+    <Compile Include="NpmPackageManagerTest.cs" />
     <Compile Include="NpmSerializeTest.cs" />
     <Compile Include="NpmSyncTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

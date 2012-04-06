@@ -1,11 +1,11 @@
-﻿using Webmatrix_Npm;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-
-namespace NpmUnitTests
+﻿namespace NpmUnitTests
 {
-    
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Webmatrix_Npm;
+
     
     /// <summary>
     ///This is a test class for NpmSerializeTest and is intended
@@ -81,13 +81,22 @@ namespace NpmUnitTests
         [TestMethod()]
         public void FromInstallTest()
         {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string output = string.Empty; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmPackage> expected = null; // TODO: Initialize to an appropriate value
             IEnumerable<INpmPackage> actual;
+            NpmSerialize target = new NpmSerialize();
+
+            string output = MockTestData.Install1Text();
+            List<NpmPackage> expected = MockTestData.Install1Expected();
+
             actual = target.FromInstall(output);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            int index = 0;
+            foreach (INpmPackage actualItem in actual)
+            {
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "ListInstalled value differs in " + diff);
+                index++;
+            }
         }
 
         /// <summary>
@@ -96,43 +105,34 @@ namespace NpmUnitTests
         [TestMethod()]
         public void FromListInstalledTest()
         {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string jsonlist = string.Empty; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> expected = null; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> actual;
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.List1Text();
+            NpmInstalledPackage expected = MockTestData.List1Expected();
+
+            INpmInstalledPackage actual;
             actual = target.FromListInstalled(jsonlist);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsNotNull(actual);
+            string diff;
+            Assert.IsTrue(expected.IsSame(actual, out diff), "ListInstalled value differs in " + diff);
         }
 
         /// <summary>
-        ///A test for FromListMissing
+        ///A test for FromListInstalled
         ///</summary>
         [TestMethod()]
-        public void FromListMissingTest()
+        public void FromListInstalledTest2()
         {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string jsonlist = string.Empty; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> expected = null; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> actual;
-            actual = target.FromListMissing(jsonlist);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
-        }
+            NpmSerialize target = new NpmSerialize();
 
-        /// <summary>
-        ///A test for FromListOutdated
-        ///</summary>
-        [TestMethod()]
-        public void FromListOutdatedTest()
-        {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string jsonlist = string.Empty; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> expected = null; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> actual;
-            actual = target.FromListOutdated(jsonlist);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            string jsonlist = MockTestData.ListProblems1Text();
+            NpmInstalledPackage expected = MockTestData.ListProblem1Expected();
+
+            INpmInstalledPackage actual;
+            actual = target.FromListInstalled(jsonlist);
+            Assert.IsNotNull(actual);
+            string diff;
+            Assert.IsTrue(expected.IsSame(actual, out diff), "ListInstalled value differs in " + diff);
         }
 
         /// <summary>
@@ -141,13 +141,22 @@ namespace NpmUnitTests
         [TestMethod()]
         public void FromOutdatedDependencyTest()
         {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string outdated = string.Empty; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmPackageDependency> expected = null; // TODO: Initialize to an appropriate value
+            NpmSerialize target = new NpmSerialize();
+
+            string outdated = MockTestData.Outdated1Text();
+            List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
+
             IEnumerable<INpmPackageDependency> actual;
             actual = target.FromOutdatedDependency(outdated);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count<INpmPackageDependency>());
+            int index = 0;
+            foreach (INpmPackageDependency actualItem in actual)
+            {
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "ListInstalled value differs in " + diff);
+                index++;
+            }
         }
 
         /// <summary>
@@ -156,47 +165,20 @@ namespace NpmUnitTests
         [TestMethod()]
         public void FromSearchResultTest()
         {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string output =
-"NAME                  DESCRIPTION                                                   AUTHOR            DATE              KEYWORDS\n" +
-"azure                 Windows Azure Client Library for node                         =andrerod         2012-02-16 05:16  node azure\n" +
-"node-swt              A library to validate and parse swt tokens                    =dario.renzulli   2012-01-18 01:07  swt acs security azure\n" +
-"node_in_windows_azure An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012 =tomgallacher 2012-01-25 15:19\n";
-
-            List<INpmSearchResultPackage> expected = new List<INpmSearchResultPackage>();
-            INpmSearchResultPackage res = new NpmSearchResultPackage("azure",
-                null,
-                "Windows Azure Client Library for node",
-                "andrerod",
-                new DateTime(2012, 2, 16, 5, 16, 0),
-                new string[] { "node", "azure" });
-            INpmSearchResultPackage res2 = new NpmSearchResultPackage("node-swt",
-                null,
-                "A library to validate and parse swt tokens",
-                "dario.renzulli",
-                new DateTime(2012, 1, 18, 1, 7, 0),
-                new string[] { "swt", "acs", "security", "azure" });
-            INpmSearchResultPackage res3 = new NpmSearchResultPackage("node_in_windows_azure",
-                null,
-                "An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012",
-                "tomgallacher",
-                new DateTime(2012, 1, 25, 15, 19, 0),
-                new string[] {});
-            expected.Add(res);
-            expected.Add(res2);
-            expected.Add(res3);
+            NpmSerialize target = new NpmSerialize();
+            string output = MockTestData.SearchResult1Text();
+            List<NpmSearchResultPackage> expected = MockTestData.SearchResult1Expected();
 
             IEnumerable<INpmSearchResultPackage> actual;
             actual = target.FromSearchResult(output);
-            int ix = 0;
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count<INpmSearchResultPackage>());
+            int index = 0;
             foreach (INpmSearchResultPackage result in actual)
             {
-                Assert.AreEqual(expected[ix].Author, result.Author);
-                Assert.AreEqual(expected[ix].Description, result.Description);
-                Assert.AreEqual(expected[ix].Date, result.Date);
-                Assert.AreEqual(expected[ix].Name, result.Name);
-                Assert.AreEqual(expected[ix].Keywords.Length, result.Keywords.Length);
-                ix++;
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(result, out diff), "Search result value differs in " + diff);
+                index++;
             }
         }
 
@@ -206,13 +188,14 @@ namespace NpmUnitTests
         [TestMethod()]
         public void FromViewTest()
         {
-            NpmSerialize target = new NpmSerialize(); // TODO: Initialize to an appropriate value
-            string jsonview = string.Empty; // TODO: Initialize to an appropriate value
-            INpmRemotePackage expected = null; // TODO: Initialize to an appropriate value
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonview = MockTestData.View1Text();
+            NpmRemotePackage expected = MockTestData.View1Expected();
             INpmRemotePackage actual;
             actual = target.FromView(jsonview);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            string diff;
+            Assert.IsTrue(expected.IsSame(actual, out diff), "View value differs in " + diff);
         }
     }
 }

@@ -7,7 +7,7 @@
     /// <summary>
     /// NpmPackage plus properties from search result
     /// </summary>
-    public class NpmSearchResultPackage : INpmSearchResultPackage
+    internal class NpmSearchResultPackage : INpmSearchResultPackage
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmSearchResultPackage" /> class.
@@ -63,5 +63,54 @@
         /// Gets the date of last publish
         /// </summary>
         public DateTime Date { get; private set; }
+
+        /// <summary>
+        /// Test if another package matches this one
+        /// </summary>
+        /// <param name="package">NpmSearchResultPackage to compare</param>
+        /// <param name="diff">Output string has name of first mismatch</param>
+        /// <returns>true if match, false if not matched</returns>
+        public bool IsSame(INpmSearchResultPackage package, out string diff)
+        {
+            diff = string.Empty;
+
+            if (this.Name != package.Name)
+            {
+                diff = "Name";
+                return false;
+            }
+
+            if (this.Description != package.Description)
+            {
+                diff = "Difference";
+                return false;
+            }
+
+            if (this.Author != package.Author)
+            {
+                diff = "Author";
+                return false;
+            }
+
+            if ((this.Keywords != null && package.Keywords == null) ||
+                (this.Keywords == null && package.Keywords != null))
+            {
+                diff = "Keywords";
+                return false;
+            }
+
+            if (this.Keywords != null)
+            {
+                if (this.Keywords.Length != package.Keywords.Length)
+                {
+                    diff = "Keywords";
+                    return false;
+                }
+
+                // TODO compare each keyword
+            }
+
+            return true;
+        }
     }
 }

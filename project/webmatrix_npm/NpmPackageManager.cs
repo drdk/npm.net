@@ -13,10 +13,30 @@
         /// Initializes a new instance of the <see cref="NpmPackageManager" /> class.
         /// </summary>
         /// <param name="wd">current project directory</param>
+        public NpmPackageManager(string wd)
+        {
+            this.ApiClient = new NpmApi(wd);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NpmPackageManager" /> class.
+        /// </summary>
+        /// <param name="wd">current project directory</param>
         /// <param name="registry">registry URL if not using default</param>
         public NpmPackageManager(string wd, string registry)
         {
-            // get NPM version. Call factory class to get client and serializer
+            this.ApiClient = new NpmApi(wd, registry);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NpmPackageManager" /> class.
+        /// </summary>
+        /// <param name="factory">NpmFactory class</param>
+        /// <param name="wd">current project directory</param>
+        /// <param name="registry">Registry URL if not using default</param>
+        public NpmPackageManager(NpmFactory factory, string wd, string registry)
+        {
+            this.ApiClient = new NpmApi(factory, wd, registry);
         }
 
         /// <summary>
@@ -98,7 +118,7 @@
         /// <returns>enumerable INpmSearchResultPackage set</returns>
         public IEnumerable<INpmSearchResultPackage> SearchRemotePackages(string searchTerms)
         {
-            return null;
+            return this.ApiClient.Search(searchTerms);
         }
 
         /// <summary>

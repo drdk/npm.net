@@ -10,13 +10,13 @@
     internal interface INpmReference
     {
         /// <summary>
-        /// Gets the reference type
+        /// Gets or sets the reference type
         /// </summary>
-        string Type { get; }
+        string Type { get; set; }
 
         /// <summary>
-        /// Gets the reference URL
+        /// Gets or sets the reference URL
         /// </summary>
-        string Url { get; }
+        string Url { get; set; }
     }
 }

@@ -159,7 +159,7 @@
                     if (!started)
                     {
                         // node may already be running
-                        throw new ApplicationException(StartFailed + nodeNpm.StartInfo.FileName);
+                        throw new InvalidOperationException(StartFailed + nodeNpm.StartInfo.FileName);
                     }
 
                     nodeNpm.BeginOutputReadLine();
@@ -168,7 +168,7 @@
                 catch (Win32Exception ex)
                 {
                     NpmSync.RemNpmSync(nodeNpm);
-                    throw new ApplicationException(StartWin32Exception, ex);
+                    throw new InvalidOperationException(StartWin32Exception, ex);
                 }
 
                 try
@@ -185,7 +185,7 @@
                         if (!exited)
                         {
                             nodeNpm.Kill();
-                            throw new ApplicationException(WaitTimeout);
+                            throw new InvalidOperationException(WaitTimeout);
                         }
 
                         // need extra wait to ensure output flushed
@@ -195,12 +195,12 @@
                 catch (Win32Exception ex)
                 {
                     NpmSync.RemNpmSync(nodeNpm);
-                    throw new ApplicationException(WaitWin32Exception, ex);
+                    throw new InvalidOperationException(WaitWin32Exception, ex);
                 }
                 catch (SystemException ex)
                 {
                     NpmSync.RemNpmSync(nodeNpm);
-                    throw new ApplicationException(WaitSystemException, ex);
+                    throw new InvalidOperationException(WaitSystemException, ex);
                 }
 
                 NpmSync sync = NpmSync.FindNpmSync(nodeNpm);

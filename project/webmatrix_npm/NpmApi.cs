@@ -104,13 +104,19 @@
         {
             string output = null;
             string err;
+            if (searchTerms == null)
+            {
+                // search for all
+                searchTerms = "/.*";
+            }
+
             int rc = this.Client.Execute("search", searchTerms, out output, out err);
-            if (rc == 0 && !string.IsNullOrWhiteSpace(output))
+            if (rc == 0)
             {
                 return this.Serializer.FromSearchResult(output);
             }
 
-            // TODO throw exception if unexpected response
+            // TODO handle unexpected response
             return null;
         }
 
