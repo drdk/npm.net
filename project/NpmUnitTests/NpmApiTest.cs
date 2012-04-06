@@ -1,12 +1,11 @@
-﻿using Webmatrix_Npm;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-
-namespace NpmUnitTests
+﻿namespace NpmUnitTests
 {
-    
-    
+    using Webmatrix_Npm;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     /// <summary>
     ///This is a test class for NpmApiTest and is intended
     ///to contain all NpmApiTest Unit Tests
@@ -70,9 +69,9 @@ namespace NpmUnitTests
         [TestMethod()]
         public void NpmApiConstructorTest()
         {
-            string cwd = string.Empty;
+            string wd = string.Empty;
             string registry = string.Empty;
-            NpmApi target = new NpmApi(cwd, registry);
+            NpmApi target = new NpmApi(wd, registry);
             Assert.IsNotNull(target);
             Assert.IsInstanceOfType(target, typeof(NpmApi));
         }
@@ -83,11 +82,11 @@ namespace NpmUnitTests
         [TestMethod()]
         public void GetInstalledVersionTest()
         {
-            string cwd = string.Empty;
+            string wd = string.Empty;
             string registry = string.Empty;
             NpmFactory factory = new MockNpmFactory();
-            NpmApi target = new NpmApi(factory, cwd, registry);
-            string expected = "1.1.9";
+            NpmApi target = new NpmApi(factory, wd, registry);
+            string expected = MockTestData.Version1Expected();
             string actual;
             actual = target.GetInstalledVersion();
             Assert.AreEqual(expected, actual);
@@ -99,15 +98,23 @@ namespace NpmUnitTests
         [TestMethod()]
         public void InstallTest()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            INpmPackage package = null; // TODO: Initialize to an appropriate value
-            bool expected = false; // TODO: Initialize to an appropriate value
-            bool actual;
+            string wd = string.Empty;
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            NpmPackage package = new NpmPackage("install1", null);
+            List<NpmPackage> expected = MockTestData.Install1Expected();
+            IEnumerable<INpmPackage> actual;
             actual = target.Install(package);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            int index = 0;
+            foreach (INpmPackage actualItem in actual)
+            {
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "Install value differs in " + diff);
+                index++;
+            }
         }
 
         /// <summary>
@@ -116,14 +123,16 @@ namespace NpmUnitTests
         [TestMethod()]
         public void ListTest()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> expected = null; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmInstalledPackage> actual;
+            string wd = "/root/project1";
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            NpmInstalledPackage expected = MockTestData.List1Expected();
+            INpmInstalledPackage actual;
             actual = target.List();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsNotNull(actual);
+            string diff;
+            Assert.IsTrue(expected.IsSame(actual, out diff), "ListInstalled value differs in " + diff);
         }
 
         /// <summary>
@@ -132,15 +141,16 @@ namespace NpmUnitTests
         [TestMethod()]
         public void OutdatedTest()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            string name = string.Empty; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmPackage> expected = null; // TODO: Initialize to an appropriate value
-            INpmPackage actual;
+            string wd = "/root/project1";
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            string name = "outdated1";
+            NpmPackageDependency expected = MockTestData.OutdatedSingle1Expected();
+            INpmPackageDependency actual;
             actual = target.Outdated(name);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            string diff;
+            Assert.IsTrue(expected.IsSame(actual, out diff), "Outdated package dependency value differs in " + diff);
         }
 
         /// <summary>
@@ -149,14 +159,22 @@ namespace NpmUnitTests
         [TestMethod()]
         public void OutdatedTest1()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            IEnumerable<INpmPackage> expected = null; // TODO: Initialize to an appropriate value
-            IEnumerable<INpmPackage> actual;
+            string wd = "/root/project1";
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
+            IEnumerable<INpmPackageDependency> actual;
             actual = target.Outdated();
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count<INpmPackageDependency>());
+            int index = 0;
+            foreach (INpmPackageDependency actualItem in actual)
+            {
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "Outdated package dependency value differs in " + diff);
+                index++;
+            }
         }
 
         /// <summary>
@@ -165,14 +183,23 @@ namespace NpmUnitTests
         [TestMethod()]
         public void SearchTest()
         {
-            string cwd = string.Empty;
+            string wd = string.Empty;
             string registry = null;
             NpmFactory factory = new MockNpmFactory();
-            NpmApi target = new NpmApi(factory, cwd, registry);
-            string searchTerms = "azure";
+            NpmApi target = new NpmApi(factory, wd, registry);
+            string searchTerms = "search1";
+            List<NpmSearchResultPackage> expected = MockTestData.SearchResult1Expected();
             IEnumerable<INpmSearchResultPackage> actual;
             actual = target.Search(searchTerms);
             Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count<INpmSearchResultPackage>());
+            int index = 0;
+            foreach (INpmSearchResultPackage result in actual)
+            {
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(result, out diff), "Search result value differs in " + diff);
+                index++;
+            }
         }
 
         /// <summary>
@@ -181,15 +208,15 @@ namespace NpmUnitTests
         [TestMethod()]
         public void UninstallTest()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            string name = string.Empty; // TODO: Initialize to an appropriate value
-            bool expected = false; // TODO: Initialize to an appropriate value
+            string wd = "/root/project1";
+            string registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            string name = "uninstall1";
+            bool expected = true;
             bool actual;
             actual = target.Uninstall(name);
             Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
         /// <summary>
@@ -198,15 +225,15 @@ namespace NpmUnitTests
         [TestMethod()]
         public void UpdateTest()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            string name = string.Empty; // TODO: Initialize to an appropriate value
-            bool expected = false; // TODO: Initialize to an appropriate value
+            string wd = "/root/project1";
+            string registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            string name = "update1";
+            bool expected = true;
             bool actual;
             actual = target.Update(name);
             Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
         }
 
         /// <summary>
@@ -215,15 +242,16 @@ namespace NpmUnitTests
         [TestMethod()]
         public void ViewTest()
         {
-            string cwd = string.Empty; // TODO: Initialize to an appropriate value
-            string registry = string.Empty; // TODO: Initialize to an appropriate value
-            NpmApi target = new NpmApi(cwd, registry); // TODO: Initialize to an appropriate value
-            string name = string.Empty; // TODO: Initialize to an appropriate value
-            INpmRemotePackage expected = null; // TODO: Initialize to an appropriate value
+            string wd = string.Empty;
+            string registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            string name = "view1";
+            NpmRemotePackage expected = MockTestData.View1Expected();
             INpmRemotePackage actual;
             actual = target.View(name);
-            Assert.AreEqual(expected, actual);
-            Assert.Inconclusive("Verify the correctness of this test method.");
+            string diff;
+            Assert.IsTrue(expected.IsSame(actual, out diff), "View value differs in " + diff);
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using Webmatrix_Npm;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-
-namespace NpmUnitTests
+﻿namespace NpmUnitTests
 {
-    
-    
+    using Webmatrix_Npm;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     /// <summary>
     ///This is a test class for NpmPackageManagerTest and is intended
     ///to contain all NpmPackageManagerTest Unit Tests
@@ -223,41 +222,18 @@ namespace NpmUnitTests
             string registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
-            string searchTerms = "azure";
-            List<INpmSearchResultPackage> expected = new List<INpmSearchResultPackage>();
-            INpmSearchResultPackage res = new NpmSearchResultPackage("azure",
-                null,
-                "Windows Azure Client Library for node",
-                "andrerod",
-                new DateTime(2012, 2, 16, 5, 16, 0),
-                new string[] { "node", "azure" });
-            INpmSearchResultPackage res2 = new NpmSearchResultPackage("node-swt",
-                null,
-                "A library to validate and parse swt tokens",
-                "dario.renzulli",
-                new DateTime(2012, 1, 18, 1, 7, 0),
-                new string[] { "swt", "acs", "security", "azure" });
-            INpmSearchResultPackage res3 = new NpmSearchResultPackage("node_in_windows_azure",
-                null,
-                "An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012",
-                "tomgallacher",
-                new DateTime(2012, 1, 25, 15, 19, 0),
-                new string[] { });
-            expected.Add(res);
-            expected.Add(res2);
-            expected.Add(res3);
+            string searchTerms = "search1";
+            List<NpmSearchResultPackage> expected = MockTestData.SearchResult1Expected();
             IEnumerable<INpmSearchResultPackage> actual;
             actual = target.SearchRemotePackages(searchTerms);
             Assert.IsNotNull(actual);
-            int ix = 0;
+            Assert.AreEqual(expected.Count, actual.Count<INpmSearchResultPackage>());
+            int index = 0;
             foreach (INpmSearchResultPackage result in actual)
             {
-                Assert.AreEqual(expected[ix].Author, result.Author);
-                Assert.AreEqual(expected[ix].Description, result.Description);
-                Assert.AreEqual(expected[ix].Date, result.Date);
-                Assert.AreEqual(expected[ix].Name, result.Name);
-                Assert.AreEqual(expected[ix].Keywords.Length, result.Keywords.Length);
-                ix++;
+                string diff;
+                Assert.IsTrue(expected[index].IsSame(result, out diff), "Search result value differs in " + diff);
+                index++;
             }
         }
 

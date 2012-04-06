@@ -77,11 +77,22 @@
         }
 
         /// <summary>
-        /// Get installed modules n project. Wraps 'npm list'
+        /// Get installed modules in project. Wraps 'npm list'
         /// </summary>
-        /// <returns>enumerable set of installed packages</returns>
-        public IEnumerable<INpmInstalledPackage> List()
+        /// <returns>installed package</returns>
+        public INpmInstalledPackage List()
         {
+            string output = null;
+            string err;
+
+
+            int rc = this.Client.Execute("list", null, out output, out err);
+            if (rc == 0)
+            {
+                return this.Serializer.FromListInstalled(output);
+            }
+
+            // TODO handle unexpected response
             return null;
         }
 
@@ -92,6 +103,21 @@
         /// <returns>NpmRemotePackage properties</returns>
         public INpmRemotePackage View(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("name is required");
+            }
+
+            string output = null;
+            string err;
+
+            int rc = this.Client.Execute("view", name, out output, out err);
+            if (rc == 0)
+            {
+                return this.Serializer.FromView(output);
+            }
+
+            // TODO handle unexpected response
             return null;
         }
 
@@ -124,18 +150,58 @@
         /// Install a npm package. Wraps 'npm install name'
         /// </summary>
         /// <param name="package">name and version to install</param>
-        /// <returns>true or false</returns>
-        public bool Install(INpmPackage package)
+        /// <returns>enumerable list of packages</returns>
+        public IEnumerable<INpmPackage> Install(INpmPackage package)
         {
-            return false;
+            if (package == null)
+            {
+                throw new ArgumentNullException("package");
+            }
+
+            if (string.IsNullOrWhiteSpace(package.Name))
+            {
+                throw new ArgumentException("package name is required");
+            }
+
+            string output = null;
+            string err;
+            string args;
+            if (!string.IsNullOrWhiteSpace(package.Version))
+            {
+                args = package.Name + "@" + package.Version;
+            }
+            else
+            {
+                args = package.Name;
+            }
+
+            int rc = this.Client.Execute("install", args, out output, out err);
+            if (rc == 0)
+            {
+                return this.Serializer.FromInstall(output);
+            }
+
+            // TODO handle unexpected response
+            return null;
         }
 
         /// <summary>
         /// Get outdated or missing dependencies. Wraps 'npm outdated'
         /// </summary>
         /// <returns>enumerable set of packages needing updates</returns>
-        public IEnumerable<INpmPackage> Outdated()
+        public IEnumerable<INpmPackageDependency> Outdated()
         {
+            string output = null;
+            string err;
+
+
+            int rc = this.Client.Execute("outdated", null, out output, out err);
+            if (rc == 0)
+            {
+                return this.Serializer.FromOutdatedDependency(output);
+            }
+
+            // TODO handle unexpected response
             return null;
         }
 
@@ -144,8 +210,27 @@
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>npm package with newer version</returns>
-        public INpmPackage Outdated(string name)
+        public INpmPackageDependency Outdated(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("name is required");
+            }
+
+            string output = null;
+            string err;
+
+            int rc = this.Client.Execute("outdated", name, out output, out err);
+            if (rc == 0)
+            {
+                IEnumerable<INpmPackageDependency> packages = this.Serializer.FromOutdatedDependency(output);
+                if (packages != null)
+                {
+                    return packages.First<INpmPackageDependency>();
+                }
+            }
+
+            // TODO handle unexpected response
             return null;
         }
 
@@ -156,6 +241,21 @@
         /// <returns>true or false</returns>
         public bool Update(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("name is required");
+            }
+
+            string output = null;
+            string err;
+
+            int rc = this.Client.Execute("update", name, out output, out err);
+            if (rc == 0)
+            {
+                return true;
+            }
+
+            // TODO handle unexpected response
             return false;
         }
 
@@ -166,6 +266,21 @@
         /// <returns>true or false</returns>
         public bool Uninstall(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("name is required");
+            }
+
+            string output = null;
+            string err;
+
+            int rc = this.Client.Execute("uninstall", name, out output, out err);
+            if (rc == 0)
+            {
+                return true;
+            }
+
+            // TODO handle unexpected response
             return false;
         }
 

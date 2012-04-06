@@ -154,6 +154,15 @@ namespace NpmUnitTests
             return "underscore@1.3.1 ./node_modules/underscore current=1.3.0\n";
         }
 
+        public static NpmPackageDependency OutdatedSingle1Expected()
+        {
+            NpmPackageDependency dependency = new NpmPackageDependency();
+            dependency.Name = "underscore";
+            dependency.Version = "1.3.0";
+            dependency.VersionRange = "1.3.1";
+            return dependency;
+        }
+
         public static List<NpmPackageDependency> Outdated1Expected()
         {
             List<NpmPackageDependency> expected = new List<NpmPackageDependency>();
@@ -260,6 +269,16 @@ namespace NpmUnitTests
             expected.License = null;
             expected.Repository = null;
             return expected;
+        }
+
+        public static string Version1Text()
+        {
+            return "1.1.9\n\n";
+        }
+
+        public static string Version1Expected()
+        {
+            return "1.1.9";
         }
 
     }

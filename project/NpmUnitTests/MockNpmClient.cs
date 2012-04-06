@@ -11,9 +11,10 @@ namespace NpmUnitTests
         public MockNpmClient() : base()
         {
         }
-        public MockNpmClient(string cwd)
-            : base(cwd)
+        public MockNpmClient(string wd)
+            : base(wd)
         {
+
         }
 
         public override int Execute(string cmd, string args, out string output, out string err)
@@ -21,11 +22,23 @@ namespace NpmUnitTests
             switch (cmd)
             {
                 case "--version":
-                    output = "1.1.9\n\n";
+                    output = MockTestData.Version1Text();
                     err = "";
                     return 0;
                 case "search":
                     return execSearch(args, out output, out err);
+                case "list":
+                    return execList(args, out output, out err);
+                case "view":
+                    return execView(args, out output, out err);
+                case "install":
+                    return execInstall(args, out output, out err);
+                case "outdated":
+                    return execOutdated(args, out output, out err);
+                case "update":
+                    return execUpdate(args, out output, out err);
+                case "uninstall":
+                    return execUninstall(args, out output, out err);
                 default:
                     break;
 
@@ -37,14 +50,94 @@ namespace NpmUnitTests
 
         private int execSearch(string args, out string output, out string err)
         {
-            if (args == "azure")
+            if (args == "search1")
             {
-                output =
-                    "NAME                  DESCRIPTION                                                   AUTHOR            DATE              KEYWORDS\n" +
-                    "azure                 Windows Azure Client Library for node                         =andrerod         2012-02-16 05:16  node azure\n" +
-                    "node-swt              A library to validate and parse swt tokens                    =dario.renzulli   2012-01-18 01:07  swt acs security azure\n" +
-                    "node_in_windows_azure An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012 =tomgallacher 2012-01-25 15:19\n";
+                output = MockTestData.SearchResult1Text();
+                err = "";
+                return 0;
+            }
+            output = "";
+            err = "Unknown test arg\n";
+            return 1;
+        }
 
+        private int execList(string args, out string output, out string err)
+        {
+            string wd = base.WorkingDirectory;
+            if (wd.IndexOf("project1") > 0)
+            {
+                output = MockTestData.List1Text();
+                err = "";
+                return 0;
+            }
+            output = "";
+            err = "Unknown working directory\n";
+            return 1;
+        }
+
+        private int execView(string args, out string output, out string err)
+        {
+            if (args == "view1")
+            {
+                output = MockTestData.View1Text();
+                err = "";
+                return 0;
+            }
+            output = "";
+            err = "Unknown test arg\n";
+            return 1;
+        }
+
+        private int execInstall(string args, out string output, out string err)
+        {
+            if (args == "install1")
+            {
+                output = MockTestData.Install1Text();
+                err = "";
+                return 0;
+            }
+            output = "";
+            err = "Unknown test arg\n";
+            return 1;
+        }
+
+        private int execOutdated(string args, out string output, out string err)
+        {
+            if (args == null)
+            {
+                output = MockTestData.Outdated1Text();
+                err = "";
+                return 0;
+            }
+            else if (args == "outdated1")
+            {
+                output = MockTestData.Outdated1Text();
+                err = "";
+                return 0;
+            }
+            output = "";
+            err = "Unknown test arg\n";
+            return 1;
+        }
+
+        private int execUpdate(string args, out string output, out string err)
+        {
+            if (args == "update1")
+            {
+                output = "";
+                err = "";
+                return 0;
+            }
+            output = "";
+            err = "Unknown test arg\n";
+            return 1;
+        }
+
+        private int execUninstall(string args, out string output, out string err)
+        {
+            if (args == "uninstall1")
+            {
+                output = "";
                 err = "";
                 return 0;
             }

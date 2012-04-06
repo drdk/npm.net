@@ -17,10 +17,10 @@
         string GetInstalledVersion();
 
         /// <summary>
-        /// Get installed modules n project. Wraps 'npm list'
+        /// Get installed modules in project. Wraps 'npm list'
         /// </summary>
-        /// <returns>enumerable set of installed packages</returns>
-        IEnumerable<INpmInstalledPackage> List();
+        /// <returns>installed package</returns>
+        INpmInstalledPackage List();
 
         /// <summary>
         /// Get properties of package in repository. Wraps 'npm view name'
@@ -40,21 +40,21 @@
         /// Install a npm package. Wraps 'npm install name'
         /// </summary>
         /// <param name="package">name and version to install</param>
-        /// <returns>true or false</returns>
-        bool Install(INpmPackage package);
+        /// <returns>enumerable list of packages</returns>
+        IEnumerable<INpmPackage> Install(INpmPackage package);
 
         /// <summary>
         /// Get outdated or missing dependencies. Wraps 'npm outdated'
         /// </summary>
         /// <returns>enumerable set of packages needing updates</returns>
-        IEnumerable<INpmPackage> Outdated();
+        IEnumerable<INpmPackageDependency> Outdated();
 
         /// <summary>
         /// Check if dependency is outdated. Wraps 'npm outdated name'
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>npm package with newer version</returns>
-        INpmPackage Outdated(string name);
+        INpmPackageDependency Outdated(string name);
 
         /// <summary>
         /// Update named package. Wraps 'npm update name'
