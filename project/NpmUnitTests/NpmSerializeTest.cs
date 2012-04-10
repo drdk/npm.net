@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Webmatrix_Npm;
+    using NodejsNpm;
 
     
     /// <summary>
@@ -72,7 +72,7 @@
         public void NpmSerializeConstructorTest()
         {
             NpmSerialize target = new NpmSerialize();
-            Assert.Inconclusive("TODO: Implement code to verify target");
+            Assert.IsNotNull(target);
         }
 
         /// <summary>

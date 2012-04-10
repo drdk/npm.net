@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Webmatrix_Npm
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;

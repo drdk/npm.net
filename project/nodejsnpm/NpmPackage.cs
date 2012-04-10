@@ -1,26 +1,23 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="NpmPackageDependency.cs" company="">
-// TODO: Update copyright text.
-// </copyright>
-// -----------------------------------------------------------------------
-
-namespace Webmatrix_Npm
+﻿namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
 
     /// <summary>
-    /// NpmPackage plus optional version range
+    /// NpmPackage has name and optional version
     /// </summary>
-    internal class NpmPackageDependency : INpmPackageDependency
+    internal class NpmPackage : INpmPackage
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NpmPackageDependency" /> class.
+        /// Initializes a new instance of the <see cref="NpmPackage" /> class.
         /// </summary>
-        public NpmPackageDependency()
+        /// <param name="name">name of package</param>
+        /// <param name="version">version of package</param>
+        public NpmPackage(string name, string version)
         {
+            this.Name = name;
+            this.Version = version;
         }
 
         /// <summary>
@@ -34,17 +31,12 @@ namespace Webmatrix_Npm
         public string Version { get; set; }
 
         /// <summary>
-        /// Gets or sets the version range of supported dependency
-        /// </summary>
-        public string VersionRange { get; set; }
-
-        /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmInstalledPackeag to compare</param>
+        /// <param name="package">NpmPackage to compare</param>
         /// <param name="diff">Output string has name of first mismatch</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmPackageDependency package, out string diff)
+        public bool IsSame(INpmPackage package, out string diff)
         {
             diff = string.Empty;
             if (this.Name != package.Name)
@@ -56,12 +48,6 @@ namespace Webmatrix_Npm
             if (this.Version != package.Version)
             {
                 diff = "Version";
-                return false;
-            }
-
-            if (this.VersionRange != package.VersionRange)
-            {
-                diff = "VersionRange";
                 return false;
             }
 

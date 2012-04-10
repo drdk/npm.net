@@ -1,6 +1,6 @@
 ﻿namespace NpmUnitTests
 {
-    using Webmatrix_Npm;
+    using NodejsNpm;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;

@@ -1,10 +1,10 @@
-project/webmatrix_npm/StyleCop.Cache
+project/nodejsnpm/StyleCop.Cache
 *.exe
 *.obj
 *.suo
 project/NpmUnitTests/bin/
 project/NpmUnitTests/obj/
-project/webmatrix_npm/bin/
-project/webmatrix_npm/obj/
+project/nodejsnpm/bin/
+project/nodejsnpm/obj/
 project/TestResults/
 

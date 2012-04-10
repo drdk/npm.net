@@ -10,7 +10,7 @@ namespace NpmUnitTests
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Webmatrix_Npm;
+    using NodejsNpm;
 
     /// <summary>
     /// TODO: Update summary.

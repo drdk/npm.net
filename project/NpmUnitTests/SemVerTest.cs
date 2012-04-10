@@ -1,11 +1,9 @@
-﻿using Webmatrix_Npm;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-
-namespace NpmUnitTests
+﻿namespace NpmUnitTests
 {
-    
-    
+    using NodejsNpm;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+
     /// <summary>
     ///This is a test class for SemVerTest and is intended
     ///to contain all SemVerTest Unit Tests
@@ -68,7 +66,7 @@ namespace NpmUnitTests
         ///A test for SemVer Constructor
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void SemVerConstructorTest()
         {
             int major = 1;
@@ -90,7 +88,7 @@ namespace NpmUnitTests
         ///A test for SemVer Constructor
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void SemVerConstructorTestBuild()
         {
             int major = 2;
@@ -112,7 +110,7 @@ namespace NpmUnitTests
         ///A test for SemVer Constructor
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void SemVerConstructorTest1()
         {
             int major = 2;
@@ -128,12 +126,11 @@ namespace NpmUnitTests
             Assert.AreEqual("2.1.3", target.Version);
         }
 
-
         /// <summary>
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestEqual()
         {
             int major = 2;
@@ -151,7 +148,7 @@ namespace NpmUnitTests
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestGreater()
         {
             int major = 2;
@@ -166,12 +163,11 @@ namespace NpmUnitTests
             int actual = target.CompareTo(semver);
             Assert.AreEqual(expected, actual);
         }
-
         /// <summary>
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestLess()
         {
             int major = 2;
@@ -191,7 +187,7 @@ namespace NpmUnitTests
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestGreaterMinor()
         {
             int major = 2;
@@ -211,7 +207,7 @@ namespace NpmUnitTests
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestLessMinor()
         {
             int major = 2;
@@ -231,7 +227,7 @@ namespace NpmUnitTests
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestGreaterMajor()
         {
             int major = 2;
@@ -251,7 +247,7 @@ namespace NpmUnitTests
         ///A test for CompareTo
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void CompareToTestLessMajor()
         {
             int major = 2;
@@ -271,7 +267,7 @@ namespace NpmUnitTests
         ///A test for Parse
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void ParseTest()
         {
             string version = "1.2.3";
@@ -290,7 +286,7 @@ namespace NpmUnitTests
         ///A test for ParseHelper
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void ParseHelperTest()
         {
             string version = "1.2.3";
@@ -311,7 +307,7 @@ namespace NpmUnitTests
         ///A test for ParseHelper
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void ParseHelperTestNoPatch()
         {
             string version = "1.2";
@@ -332,7 +328,7 @@ namespace NpmUnitTests
         ///A test for ParseHelper
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void ParseHelperTestNoMinor()
         {
             string version = "1";
@@ -353,7 +349,7 @@ namespace NpmUnitTests
         ///A test for ParseHelper
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void ParseHelperTestPrerel()
         {
             string version = "1.2.3-prerel.1.2";
@@ -376,7 +372,7 @@ namespace NpmUnitTests
         ///A test for ParseHelper
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void ParseHelperTestBuild()
         {
             string version = "1.2.3+build-5";
@@ -420,7 +416,7 @@ namespace NpmUnitTests
         ///A test for Build
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void BuildTest()
         {
             SemVer_Accessor target = new SemVer_Accessor(0, 0, 0);
@@ -435,7 +431,7 @@ namespace NpmUnitTests
         ///A test for Major
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void MajorTest()
         {
             SemVer_Accessor target = new SemVer_Accessor(0, 0, 0);
@@ -450,7 +446,7 @@ namespace NpmUnitTests
         ///A test for Minor
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void MinorTest()
         {
             SemVer_Accessor target = new SemVer_Accessor(0, 0, 0);
@@ -465,7 +461,7 @@ namespace NpmUnitTests
         ///A test for Patch
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void PatchTest()
         {
             SemVer_Accessor target = new SemVer_Accessor(0, 0, 0);
@@ -480,7 +476,7 @@ namespace NpmUnitTests
         ///A test for PreRelease
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void PreReleaseTest()
         {
             SemVer_Accessor target = new SemVer_Accessor(0, 0, 0);
@@ -495,7 +491,7 @@ namespace NpmUnitTests
         ///A test for Version
         ///</summary>
         [TestMethod()]
-        [DeploymentItem("webmatrix_npm.dll")]
+        [DeploymentItem("nodejsnpm.dll")]
         public void VersionTest()
         {
             SemVer_Accessor target = new SemVer_Accessor(1, 2, 3);
