@@ -1,36 +1,43 @@
-﻿namespace NpmUnitTests
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmSerializeTest.cs" company="Microsoft">
+// Class for npm package manager unit tests
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NpmUnitTests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NodejsNpm;
 
-    
     /// <summary>
-    ///This is a test class for NpmSerializeTest and is intended
-    ///to contain all NpmSerializeTest Unit Tests
-    ///</summary>
-    [TestClass()]
+    /// This is a test class for NpmSerializeTest and is intended
+    /// to contain all NpmSerializeTest Unit Tests
+    /// </summary>
+    [TestClass]
     public class NpmSerializeTest
     {
-
-
+        /// <summary>
+        /// Value used by test framework
+        /// </summary>
         private TestContext testContextInstance;
 
         /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
+        /// Gets or sets the test context which provides
+        /// information about and functionality for the current test run.
+        /// </summary>
         public TestContext TestContext
         {
             get
             {
-                return testContextInstance;
+                return this.testContextInstance;
             }
+
             set
             {
-                testContextInstance = value;
+                this.testContextInstance = value;
             }
         }
 
@@ -64,11 +71,10 @@
         //
         #endregion
 
-
         /// <summary>
-        ///A test for NpmSerialize Constructor
-        ///</summary>
-        [TestMethod()]
+        /// A test for NpmSerialize Constructor
+        /// </summary>
+        [TestMethod]
         public void NpmSerializeConstructorTest()
         {
             NpmSerialize target = new NpmSerialize();
@@ -76,69 +82,128 @@
         }
 
         /// <summary>
-        ///A test for FromInstall
-        ///</summary>
-        [TestMethod()]
+        /// A test for FromInstall
+        /// </summary>
+        [TestMethod]
         public void FromInstallTest()
         {
-            IEnumerable<INpmPackage> actual;
+            IEnumerable<INpmInstalledPackage> actual;
             NpmSerialize target = new NpmSerialize();
 
             string output = MockTestData.Install1Text();
-            List<NpmPackage> expected = MockTestData.Install1Expected();
+            List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
 
             actual = target.FromInstall(output);
             Assert.IsNotNull(actual);
             Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
             int index = 0;
-            foreach (INpmPackage actualItem in actual)
+            foreach (NpmInstalledPackage actualItem in actual)
             {
-                string diff;
-                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "ListInstalled value differs in " + diff);
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Installed value differs");
                 index++;
             }
         }
 
         /// <summary>
-        ///A test for FromListInstalled
-        ///</summary>
-        [TestMethod()]
+        /// A test for FromListInstalled
+        /// </summary>
+        [TestMethod]
         public void FromListInstalledTest()
         {
             NpmSerialize target = new NpmSerialize();
 
             string jsonlist = MockTestData.List1Text();
-            NpmInstalledPackage expected = MockTestData.List1Expected();
+            List<NpmInstalledPackage> expected = MockTestData.List1Expected();
 
-            INpmInstalledPackage actual;
+            IEnumerable<INpmInstalledPackage> actual;
             actual = target.FromListInstalled(jsonlist);
             Assert.IsNotNull(actual);
-            string diff;
-            Assert.IsTrue(expected.IsSame(actual, out diff), "ListInstalled value differs in " + diff);
+            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Installed value differs");
+                index++;
+            }
         }
 
         /// <summary>
-        ///A test for FromListInstalled
-        ///</summary>
-        [TestMethod()]
+        /// A test for FromListInstalled
+        /// </summary>
+        [TestMethod]
         public void FromListInstalledTest2()
         {
             NpmSerialize target = new NpmSerialize();
 
             string jsonlist = MockTestData.ListProblems1Text();
-            NpmInstalledPackage expected = MockTestData.ListProblem1Expected();
+            List<NpmInstalledPackage> expected = MockTestData.ListProblem1Expected();
 
-            INpmInstalledPackage actual;
+            IEnumerable<INpmInstalledPackage> actual;
             actual = target.FromListInstalled(jsonlist);
             Assert.IsNotNull(actual);
-            string diff;
-            Assert.IsTrue(expected.IsSame(actual, out diff), "ListInstalled value differs in " + diff);
+            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Installed value differs");
+                index++;
+            }
         }
 
         /// <summary>
-        ///A test for FromOutdatedDependency
-        ///</summary>
-        [TestMethod()]
+        /// A test for FromListInstalled
+        /// </summary>
+        [TestMethod]
+        public void FromListMatchInstalledTest1()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.List1Text();
+            NpmPackage package = MockTestData.List1MatchInstalledPackage();
+            NpmInstalledPackage expected = MockTestData.List1MatchInstalledExpected();
+
+            INpmInstalledPackage actual;
+            actual = target.FromListMatchInstalled(jsonlist, package);
+            if (expected == null)
+            {
+                Assert.AreEqual(expected, actual);
+            }
+            else
+            {
+                Assert.IsNotNull(actual);
+                Assert.IsTrue(expected.IsSame(actual), "Installed value differs");
+            }
+        }
+
+        /// <summary>
+        /// A test for FromListInstalled
+        /// </summary>
+        [TestMethod]
+        public void FromListMatchInstalledTest2()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.List1Text();
+            NpmPackage package = MockTestData.List2MatchInstalledPackage();
+            NpmInstalledPackage expected = MockTestData.List2MatchInstalledExpected();
+
+            INpmInstalledPackage actual;
+            actual = target.FromListMatchInstalled(jsonlist, package);
+            if (expected == null)
+            {
+                Assert.AreEqual(expected, actual);
+            }
+            else
+            {
+                Assert.IsNotNull(actual);
+                Assert.IsTrue(expected.IsSame(actual), "Installed value differs");
+            }
+        }
+
+        /// <summary>
+        /// A test for FromOutdatedDependency
+        /// </summary>
+        [TestMethod]
         public void FromOutdatedDependencyTest()
         {
             NpmSerialize target = new NpmSerialize();
@@ -153,16 +218,15 @@
             int index = 0;
             foreach (INpmPackageDependency actualItem in actual)
             {
-                string diff;
-                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "ListInstalled value differs in " + diff);
+                Assert.IsTrue(expected[index].IsSame(actualItem), "ListInstalled value differs");
                 index++;
             }
         }
 
         /// <summary>
-        ///A test for FromSearchResult
-        ///</summary>
-        [TestMethod()]
+        /// A test for FromSearchResult
+        /// </summary>
+        [TestMethod]
         public void FromSearchResultTest()
         {
             NpmSerialize target = new NpmSerialize();
@@ -176,16 +240,15 @@
             int index = 0;
             foreach (INpmSearchResultPackage result in actual)
             {
-                string diff;
-                Assert.IsTrue(expected[index].IsSame(result, out diff), "Search result value differs in " + diff);
+                Assert.IsTrue(expected[index].IsSame(result), "Search result value differs");
                 index++;
             }
         }
 
         /// <summary>
-        ///A test for FromView
-        ///</summary>
-        [TestMethod()]
+        /// A test for FromView
+        /// </summary>
+        [TestMethod]
         public void FromViewTest()
         {
             NpmSerialize target = new NpmSerialize();
@@ -194,8 +257,7 @@
             NpmRemotePackage expected = MockTestData.View1Expected();
             INpmRemotePackage actual;
             actual = target.FromView(jsonview);
-            string diff;
-            Assert.IsTrue(expected.IsSame(actual, out diff), "View value differs in " + diff);
+            Assert.IsTrue(expected.IsSame(actual), "View value differs");
         }
     }
 }

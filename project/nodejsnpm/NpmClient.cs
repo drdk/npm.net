@@ -1,17 +1,25 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmClient.cs" company="Microsoft">
+// Class for npm package manager client execution
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Security;
     using System.Text;
     using System.Timers;
 
     /// <summary>
     /// The class that invokes NPM commands and returns the results text
     /// </summary>
-    internal class NpmClient : INpmClient
+    [SecurityCritical]
+    public class NpmClient : INpmClient
     {
         /// <summary>
         /// The default installation path for node
@@ -21,7 +29,7 @@
         /// <summary>
         /// The default relative path to NPM
         /// </summary>
-        private const string DefNpmRelPath = @"node_modules\npm\bin\npm-cli.js";
+        private const string DefNpmRelativePath = @"node_modules\npm\bin\npm-cli.js";
 
         /// <summary>
         /// The executable file name for node
@@ -54,14 +62,25 @@
         private const string WaitSystemException = "Fatal: process wait failed due to system error";
 
         /// <summary>
+        /// The output from most recent execute
+        /// </summary>
+        private string lastExecuteOutput;
+
+        /// <summary>
+        /// The error output from most recent execute
+        /// </summary>
+        private string lastExecuteErrorText;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NpmClient" /> class.
         /// </summary>
+        [SecurityCritical]
         public NpmClient()
         {
             this.WorkingDirectory = Environment.CurrentDirectory;
             this.Timeout = 0;
             this.InstallPath = Environment.ExpandEnvironmentVariables(DefInstallPath);
-            this.NpmRelPath = DefNpmRelPath;
+            this.NpmRelativePath = DefNpmRelativePath;
         }
 
         /// <summary>
@@ -69,58 +88,125 @@
         /// Accepts the current project directory.
         /// </summary>
         /// <param name="wd">project directory</param>
+        [SecurityCritical]
         public NpmClient(string wd)
         {
             this.WorkingDirectory = wd;
             this.Timeout = 0;
             this.InstallPath = Environment.ExpandEnvironmentVariables(DefInstallPath);
-            this.NpmRelPath = DefNpmRelPath;
+            this.NpmRelativePath = DefNpmRelativePath;
         }
 
         /// <summary>
         /// Gets or sets installation path for node
         /// </summary>
-        public string InstallPath { get; set; }
+        public string InstallPath 
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets relative path to NPM from node installation
         /// </summary>
-        public string NpmRelPath { get; set; }
+        public string NpmRelativePath
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets project directory used for some NPM commands
         /// </summary>
-        public string WorkingDirectory { get; set; }
+        public string WorkingDirectory
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets URL of remote registry. Only set if not using default NPM.
         /// </summary>
-        public string Registry { get; set; }
+        public string Registry
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets HTTP Proxy URL
         /// </summary>
-        public string HttpProxy { get; set; }
+        public string HttpProxy
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets HTTPS Proxy URL
         /// </summary>
-        public string HttpsProxy { get; set; }
+        public string HttpsProxy
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets timeout to use for NPM commands
         /// </summary>
-        public int Timeout { get; set; }
+        public int Timeout
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
-        /// Execute NPM command and return output
+        /// Gets the output text from the last NPM command
+        /// </summary>
+        public string LastExecuteOutput
+        {
+            [SecurityCritical]
+            get
+            {
+                return this.lastExecuteOutput;
+            }
+        }
+
+        /// <summary>
+        /// Gets the error text from the last NPM command
+        /// </summary>
+        public string LastExecuteErrorText
+        {
+            [SecurityCritical]
+            get
+            {
+                return this.lastExecuteErrorText;
+            }
+        }
+
+        /// <summary>
+        /// Execute NPM command and save output
         /// </summary>
         /// <param name="cmd">command name</param>
         /// <param name="args">remainder of npm command line</param>
-        /// <param name="output">captured stdout result from npm</param>
-        /// <param name="err">captured stderr result from npm</param>
         /// <returns>exit code. 0 is success</returns>
-        public virtual int Execute(string cmd, string args, out string output, out string err)
+        /// <remarks>LastExecuteOutput and LastExecuteError will be set</remarks>
+        [SecurityCritical]
+        public int Execute(string cmd, string args)
         {
             if (string.IsNullOrWhiteSpace(cmd))
             {
@@ -128,7 +214,7 @@
             }
 
             // npm-cli.js full path in quotes with space trailer
-            string npmcli = "\"" + Path.Combine(this.InstallPath, this.NpmRelPath) + "\" ";
+            string npmcli = "\"" + Path.Combine(this.InstallPath, this.NpmRelativePath) + "\" ";
 
             using (Process nodeNpm = new Process())
             {
@@ -205,12 +291,15 @@
 
                 NpmSync sync = NpmSync.FindNpmSync(nodeNpm);
                 NpmSync.RemNpmSync(nodeNpm);
-                output = string.Empty;
-                err = string.Empty;
                 if (sync != null)
                 {
-                    output = sync.GetOutput();
-                    err = sync.GetError();
+                    this.lastExecuteOutput = sync.GetOutput();
+                    this.lastExecuteErrorText = sync.GetError();
+                }
+                else
+                {
+                    this.lastExecuteOutput = string.Empty;
+                    this.lastExecuteErrorText = string.Empty;
                 }
 
                 return nodeNpm.ExitCode;
@@ -222,6 +311,7 @@
         /// </summary>
         /// <param name="sendingProcess">The sender</param>
         /// <param name="outLine">The event</param>
+        [SecurityCritical]
         private static void ErrorOutputHandler(
                                                 object sendingProcess, 
                                                 DataReceivedEventArgs outLine)
@@ -242,6 +332,7 @@
         /// </summary>
         /// <param name="sendingProcess">The sender</param>
         /// <param name="outLine">The event</param>
+        [SecurityCritical]
         private static void StandardOutputHandler(
                                                 object sendingProcess,
                                                 DataReceivedEventArgs outLine)

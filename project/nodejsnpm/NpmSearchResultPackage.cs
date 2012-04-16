@@ -1,13 +1,20 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmSearchResultPackage.cs" company="Microsoft">
+// Class for some npm package manager Search Result representation
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
+    using System.Security;
     using System.Text;
 
     /// <summary>
     /// NpmPackage plus properties from search result
     /// </summary>
-    internal class NpmSearchResultPackage : INpmSearchResultPackage
+    public class NpmSearchResultPackage : INpmSearchResultPackage
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmSearchResultPackage" /> class.
@@ -31,83 +38,105 @@
             this.Description = description;
             this.Author = author;
             this.Keywords = keywords;
-            this.Date = date;
+            this.LatestDate = date;
         }
 
         /// <summary>
         /// Gets or sets name of Npm object
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
-        /// Gets or sets version of Npm object if known
+        /// Gets or sets the version of Npm object if known
         /// </summary>
-        public string Version { get; set; }
+        public string Version
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
-        /// Gets the text description
+        /// Gets or sets the text description
         /// </summary>
-        public string Description { get; private set; }
+        public string Description
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
-        /// Gets the author of project
+        /// Gets or sets the author of project
         /// </summary>
-        public string Author { get; private set; }
+        public string Author
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
-        /// Gets the keywords
+        /// Gets or sets the keywords
         /// </summary>
-        public string[] Keywords { get; private set; }
+        public IEnumerable<string> Keywords
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
-        /// Gets the date of last publish
+        /// Gets or sets the date of last publish
         /// </summary>
-        public DateTime Date { get; private set; }
+        public DateTime LatestDate
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
         /// <param name="package">NpmSearchResultPackage to compare</param>
-        /// <param name="diff">Output string has name of first mismatch</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmSearchResultPackage package, out string diff)
+        public bool IsSame(INpmSearchResultPackage package)
         {
-            diff = string.Empty;
+            if (package == null)
+            {
+                return false;
+            }
 
             if (this.Name != package.Name)
             {
-                diff = "Name";
                 return false;
             }
 
             if (this.Description != package.Description)
             {
-                diff = "Difference";
                 return false;
             }
 
             if (this.Author != package.Author)
             {
-                diff = "Author";
                 return false;
             }
 
-            if ((this.Keywords != null && package.Keywords == null) ||
-                (this.Keywords == null && package.Keywords != null))
+            if (!NpmPackage.IsSameStringEnumeration(this.Keywords, package.Keywords))
             {
-                diff = "Keywords";
                 return false;
-            }
-
-            if (this.Keywords != null)
-            {
-                if (this.Keywords.Length != package.Keywords.Length)
-                {
-                    diff = "Keywords";
-                    return false;
-                }
-
-                // TODO compare each keyword
             }
 
             return true;

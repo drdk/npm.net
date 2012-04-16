@@ -2,18 +2,21 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DB863DE6-F115-41CC-9384-3411100AC854}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{BED55CE3-4502-4491-8A35-08E515CBE4B9}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NodejsNpm</RootNamespace>
-    <AssemblyName>nodejsnpm</AssemblyName>
+    <RootNamespace>NpmApiSample</RootNamespace>
+    <AssemblyName>NpmApiSample</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,7 +25,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,8 +37,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,26 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="interfaces\INpmApi.cs" />
-    <Compile Include="interfaces\INpmClient.cs" />
-    <Compile Include="interfaces\INpmPackage.cs" />
-    <Compile Include="interfaces\INpmPackageManager.cs" />
-    <Compile Include="interfaces\INpmSerialize.cs" />
-    <Compile Include="NpmApi.cs" />
-    <Compile Include="NpmClient.cs" />
-    <Compile Include="NpmFactory.cs" />
-    <Compile Include="NpmInstalledPackage.cs" />
-    <Compile Include="NpmPackage.cs" />
-    <Compile Include="NpmPackageDependency.cs" />
-    <Compile Include="NpmPackageManager.cs" />
-    <Compile Include="NpmReference.cs" />
-    <Compile Include="NpmRemotePackage.cs" />
-    <Compile Include="NpmSearchResultPackage.cs" />
-    <Compile Include="NpmSerialize.cs" />
-    <Compile Include="NpmSync.cs" />
+    <Compile Include="ApiSample.cs" />
+    <Compile Include="PackageManagerSample.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\nodejsnpm\NodejsNpm.csproj">
+      <Project>{DB863DE6-F115-41CC-9384-3411100AC854}</Project>
+      <Name>NodejsNpm</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

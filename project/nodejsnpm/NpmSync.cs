@@ -1,4 +1,10 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmSync.cs" company="Microsoft">
+// Class for npm package manager helper to synchronize completion
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;

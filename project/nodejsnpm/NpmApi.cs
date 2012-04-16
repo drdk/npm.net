@@ -1,19 +1,34 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmApi.cs" company="Microsoft">
+// Class for npm package manager low level API
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Security;
     using System.Text;
 
     /// <summary>
     /// The class implements a wrapper for NPM commands
     /// </summary>
-    internal class NpmApi : INpmApi
+    [SecurityCritical]
+    public class NpmApi : INpmApi
     {
+        /// <summary>
+        /// Working directory root
+        /// </summary>
+        private string rootWorkingDirectory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmApi" /> class.
         /// </summary>
         /// <param name="wd">Working directory for project</param>
+        [SecurityCritical]
         public NpmApi(string wd)
         {
             NpmFactory factory = new NpmFactory();
@@ -25,6 +40,7 @@
         /// </summary>
         /// <param name="wd">Working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
+        [SecurityCritical]
         public NpmApi(string wd, string registry)
         {
             NpmFactory factory = new NpmFactory();
@@ -38,15 +54,28 @@
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">Working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
+        [SecurityCritical]
         public NpmApi(NpmFactory factory, string wd, string registry)
         {
             this.Initialize(factory, wd, registry);
         }
 
          /// <summary>
-        /// Gets the NPM version string
+        /// Gets the NPM version string  
         /// </summary>
         public string NpmVersion { get; private set; }
+
+        /// <summary>
+        /// Gets the INpmClient interface being used
+        /// </summary>
+        public INpmClient NpmClient
+        {
+            [SecurityCritical]
+            get
+            {
+                return this.Client;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Cient being used to execute npm
@@ -62,14 +91,14 @@
         /// Get npm version. Wraps 'npm --version'
         /// </summary>
         /// <returns>version string</returns>
+        [SecurityCritical]
         public string GetInstalledVersion()
         {
-            string version;
-            string err;
-            int rc = this.Client.Execute("--version", null, out version, out err);
+            int rc = this.Client.Execute("--version", null);
             if (rc == 0)
             {
-                return version.Trim();
+                string output = this.Client.LastExecuteOutput;
+                return output.Trim();
             }
 
             // TODO throw exception if unexpected response
@@ -77,18 +106,46 @@
         }
 
         /// <summary>
+        /// Set working directory for dependency.
+        /// </summary>
+        /// <param name="dependency">Dependency path or null for root</param>
+        /// <remarks>Use '/' for multiple level dependency</remarks>
+        [SecurityCritical]
+        public void SetDependencyDirectory(string dependency)
+        {
+            if (dependency == null)
+            {
+                this.Client.WorkingDirectory = this.rootWorkingDirectory;
+            }
+            else
+            {
+                string path = this.ConvertDependToPath(dependency);
+                this.Client.WorkingDirectory = path;
+            }
+        }
+
+        /// <summary>
+        /// Change the working directory
+        /// </summary>
+        /// <param name="path">Full path</param>
+        [SecurityCritical]
+        public void SetWorkingDirectory(string path)
+        {
+            this.Client.WorkingDirectory = path;
+            this.rootWorkingDirectory = path;
+        }
+
+        /// <summary>
         /// Get installed modules in project. Wraps 'npm list'
         /// </summary>
-        /// <returns>installed package</returns>
-        public INpmInstalledPackage List()
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        [SecurityCritical]
+        public IEnumerable<INpmInstalledPackage> List()
         {
-            string output = null;
-            string err;
-
-
-            int rc = this.Client.Execute("list", null, out output, out err);
+            int rc = this.Client.Execute("list", "--json");
             if (rc == 0)
             {
+                string output = this.Client.LastExecuteOutput;
                 return this.Serializer.FromListInstalled(output);
             }
 
@@ -101,6 +158,7 @@
         /// </summary>
         /// <param name="name">package name</param>
         /// <returns>NpmRemotePackage properties</returns>
+        [SecurityCritical]
         public INpmRemotePackage View(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -108,12 +166,10 @@
                 throw new ArgumentException("name is required");
             }
 
-            string output = null;
-            string err;
-
-            int rc = this.Client.Execute("view", name, out output, out err);
+            int rc = this.Client.Execute("view", name);
             if (rc == 0)
             {
+                string output = this.Client.LastExecuteOutput;
                 return this.Serializer.FromView(output);
             }
 
@@ -124,21 +180,21 @@
         /// <summary>
         /// Search for npm packages in repository. Wraps 'npm search term'
         /// </summary>
-        /// <param name="searchTerms">words to use in search</param>
+        /// <param name="searchTerms">words to use in search or null for all</param>
         /// <returns>enumerable set of matching packages</returns>
+        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> Search(string searchTerms)
         {
-            string output = null;
-            string err;
             if (searchTerms == null)
             {
                 // search for all
                 searchTerms = "/.*";
             }
 
-            int rc = this.Client.Execute("search", searchTerms, out output, out err);
+            int rc = this.Client.Execute("search", searchTerms);
             if (rc == 0)
             {
+                string output = this.Client.LastExecuteOutput;
                 return this.Serializer.FromSearchResult(output);
             }
 
@@ -151,7 +207,8 @@
         /// </summary>
         /// <param name="package">name and version to install</param>
         /// <returns>enumerable list of packages</returns>
-        public IEnumerable<INpmPackage> Install(INpmPackage package)
+        [SecurityCritical]
+        public IEnumerable<INpmInstalledPackage> Install(INpmPackage package)
         {
             if (package == null)
             {
@@ -163,8 +220,6 @@
                 throw new ArgumentException("package name is required");
             }
 
-            string output = null;
-            string err;
             string args;
             if (!string.IsNullOrWhiteSpace(package.Version))
             {
@@ -175,9 +230,10 @@
                 args = package.Name;
             }
 
-            int rc = this.Client.Execute("install", args, out output, out err);
+            int rc = this.Client.Execute("install", args + " --json");
             if (rc == 0)
             {
+                string output = this.Client.LastExecuteOutput;
                 return this.Serializer.FromInstall(output);
             }
 
@@ -189,15 +245,13 @@
         /// Get outdated or missing dependencies. Wraps 'npm outdated'
         /// </summary>
         /// <returns>enumerable set of packages needing updates</returns>
+        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> Outdated()
         {
-            string output = null;
-            string err;
-
-
-            int rc = this.Client.Execute("outdated", null, out output, out err);
+            int rc = this.Client.Execute("outdated", null);
             if (rc == 0)
             {
+                string output = this.Client.LastExecuteOutput;
                 return this.Serializer.FromOutdatedDependency(output);
             }
 
@@ -209,25 +263,20 @@
         /// Check if dependency is outdated. Wraps 'npm outdated name'
         /// </summary>
         /// <param name="name">name of package</param>
-        /// <returns>npm package with newer version</returns>
-        public INpmPackageDependency Outdated(string name)
+        /// <returns>enumerable set of packages needing updates</returns>
+        [SecurityCritical]
+        public IEnumerable<INpmPackageDependency> Outdated(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentException("name is required");
             }
 
-            string output = null;
-            string err;
-
-            int rc = this.Client.Execute("outdated", name, out output, out err);
+            int rc = this.Client.Execute("outdated", name);
             if (rc == 0)
             {
-                IEnumerable<INpmPackageDependency> packages = this.Serializer.FromOutdatedDependency(output);
-                if (packages != null)
-                {
-                    return packages.First<INpmPackageDependency>();
-                }
+                string output = this.Client.LastExecuteOutput;
+                return this.Serializer.FromOutdatedDependency(output);
             }
 
             // TODO handle unexpected response
@@ -238,25 +287,29 @@
         /// Update named package. Wraps 'npm update name'
         /// </summary>
         /// <param name="name">name of package</param>
-        /// <returns>true or false</returns>
-        public bool Update(string name)
+        /// <returns>enumerable list of updated packages</returns>
+        [SecurityCritical]
+        public IEnumerable<INpmInstalledPackage> Update(string name)
         {
+            string args;
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("name is required");
+                args = string.Empty;
+            }
+            else
+            {
+                args = name;
             }
 
-            string output = null;
-            string err;
-
-            int rc = this.Client.Execute("update", name, out output, out err);
+            int rc = this.Client.Execute("update", args + " --json");
             if (rc == 0)
             {
-                return true;
+                string output = this.Client.LastExecuteOutput;
+                return this.Serializer.FromInstall(output);
             }
 
             // TODO handle unexpected response
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -264,6 +317,7 @@
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>true or false</returns>
+        [SecurityCritical]
         public bool Uninstall(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -271,10 +325,7 @@
                 throw new ArgumentException("name is required");
             }
 
-            string output = null;
-            string err;
-
-            int rc = this.Client.Execute("uninstall", name, out output, out err);
+            int rc = this.Client.Execute("uninstall", name);
             if (rc == 0)
             {
                 return true;
@@ -285,11 +336,31 @@
         }
 
         /// <summary>
-        /// Common initializtion for constructors
+        /// Check if package is installed. Wraps 'npm list' and looks for match
+        /// </summary>
+        /// <param name="package">name and version to install</param>
+        /// <returns>NpmInstalledPackage or null</returns>
+        [SecurityCritical]
+        public INpmInstalledPackage TestInstalled(INpmPackage package)
+        {
+            int rc = this.Client.Execute("list", "--json");
+            if (rc == 0)
+            {
+                string output = this.Client.LastExecuteOutput;
+                return this.Serializer.FromListMatchInstalled(output, package);
+            }
+
+            // TODO handle unexpected response
+            return null;
+        }
+
+        /// <summary>
+        /// Common initialization for constructors
         /// </summary>
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
+        [SecurityCritical]
         private void Initialize(NpmFactory factory, string wd, string registry)
         {
             // first get default client
@@ -309,6 +380,28 @@
             if (!string.IsNullOrWhiteSpace(wd))
             {
                 this.Client.WorkingDirectory = wd;
+                this.rootWorkingDirectory = wd;
+            }
+        }
+
+        /// <summary>
+        /// Build absolute path for specified dependency
+        /// </summary>
+        /// <param name="depends">dependency name</param>
+        /// <returns>Absolute path based on working directory</returns>
+        [SecurityCritical]
+        private string ConvertDependToPath(string depends)
+        {
+            string relative = NpmSerialize.ConvertDependToPath(depends);
+            if (relative != null)
+            {
+                string absolute = Path.Combine(this.rootWorkingDirectory, relative.Replace('/', '\\'));
+
+                return absolute;
+            }
+            else
+            {
+                return this.rootWorkingDirectory;
             }
         }
     }

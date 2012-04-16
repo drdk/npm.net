@@ -1,4 +1,10 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmFactory.cs" company="Microsoft">
+// Class for npm package manager class factory
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
@@ -8,7 +14,7 @@
     /// <summary>
     /// Factory to return client and serialize objects for current version
     /// </summary>
-    internal class NpmFactory
+    public class NpmFactory
     {
         /// <summary>
         /// Get NpmClient to support the version.

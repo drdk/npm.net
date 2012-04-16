@@ -1,4 +1,10 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="INpmPackageManager.cs" company="Microsoft">
+// Interface for npm package manager high level API
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
@@ -7,14 +13,14 @@
     /// <summary>
     /// High level interface to manage NPM installation
     /// </summary>
-    internal interface INpmPackageManager
+    public interface INpmPackageManager
     {
         /// <summary>
         /// Get set of dependencies for project that are not installed or not up to date
         /// </summary>
         /// <param name="package">Packege to be checked</param>
         /// <returns>enumerable INpmInstalledPackage set</returns>
-        IEnumerable<INpmInstalledPackage> FindDependenciesToBeInstalled(INpmPackage package);
+        IEnumerable<INpmPackageDependency> FindDependenciesToBeInstalled(INpmPackage package);
 
         /// <summary>
         /// Find remote packages matching the given names
@@ -52,8 +58,8 @@
         /// Test if the package is installed in current project
         /// </summary>
         /// <param name="package">name and optional version to test</param>
-        /// <returns>true or false</returns>
-        bool IsPackageInstalled(INpmPackage package);
+        /// <returns>INpmInstalledPackage or null</returns>
+        INpmInstalledPackage IsPackageInstalled(INpmPackage package);
 
         /// <summary>
         /// Find all remote packages matching search terms

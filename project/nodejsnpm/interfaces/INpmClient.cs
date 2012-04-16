@@ -1,4 +1,10 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="INpmClient.cs" company="Microsoft">
+// Interface for npm package manager client execution
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +13,7 @@
     /// <summary>
     /// Interface to manage invoking NPM client
     /// </summary>
-    internal interface INpmClient
+    public interface INpmClient
     {
         /// <summary>
         /// Gets or sets installation path for node
@@ -17,7 +23,7 @@
         /// <summary>
         /// Gets or sets relative path to NPM from node installation
         /// </summary>
-        string NpmRelPath { get; set; }
+        string NpmRelativePath { get; set; }
 
         /// <summary>
         /// Gets or sets project directory used for some NPM commands
@@ -45,13 +51,22 @@
         int Timeout { get; set; }
 
         /// <summary>
-        /// Execute NPM command and return output
+        /// Gets the output text from the last NPM command
+        /// </summary>
+        string LastExecuteOutput { get; }
+
+        /// <summary>
+        /// Gets the error text from the last NPM command
+        /// </summary>
+        string LastExecuteErrorText { get; }
+
+        /// <summary>
+        /// Execute NPM command and save output
         /// </summary>
         /// <param name="cmd">command name</param>
         /// <param name="args">remainder of npm command line</param>
-        /// <param name="output">captured stdout result from npm</param>
-        /// <param name="err">captured stderr result from npm</param>
         /// <returns>exit code. 0 is success</returns>
-        int Execute(string cmd, string args, out string output, out string err);
+        /// <remarks>LastExecuteOutput and LastExecuteError will be set</remarks>
+        int Execute(string cmd, string args);
     }
 }

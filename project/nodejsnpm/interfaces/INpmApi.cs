@@ -1,4 +1,10 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="INpmApi.cs" company="Microsoft">
+// Interface for npm package manager low level API
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
@@ -8,8 +14,16 @@
     /// <summary>
     /// Low level NPM API wrapper
     /// </summary>
-    internal interface INpmApi
+    public interface INpmApi
     {
+        /// <summary>
+        /// Gets the INpmClient interface being used
+        /// </summary>
+        INpmClient NpmClient
+        {
+            get;
+        }
+
         /// <summary>
         /// Get npm version. Wraps 'npm --version'
         /// </summary>
@@ -17,10 +31,23 @@
         string GetInstalledVersion();
 
         /// <summary>
+        /// Set working directory for dependency.
+        /// </summary>
+        /// <param name="dependency">Dependency path</param>
+        /// <remarks>Use '/' for multiple level dependency</remarks>
+        void SetDependencyDirectory(string dependency);
+
+        /// <summary>
+        /// Change the working directory
+        /// </summary>
+        /// <param name="path">Full path</param>
+        void SetWorkingDirectory(string path);
+
+        /// <summary>
         /// Get installed modules in project. Wraps 'npm list'
         /// </summary>
-        /// <returns>installed package</returns>
-        INpmInstalledPackage List();
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        IEnumerable<INpmInstalledPackage> List();
 
         /// <summary>
         /// Get properties of package in repository. Wraps 'npm view name'
@@ -41,7 +68,7 @@
         /// </summary>
         /// <param name="package">name and version to install</param>
         /// <returns>enumerable list of packages</returns>
-        IEnumerable<INpmPackage> Install(INpmPackage package);
+        IEnumerable<INpmInstalledPackage> Install(INpmPackage package);
 
         /// <summary>
         /// Get outdated or missing dependencies. Wraps 'npm outdated'
@@ -53,15 +80,15 @@
         /// Check if dependency is outdated. Wraps 'npm outdated name'
         /// </summary>
         /// <param name="name">name of package</param>
-        /// <returns>npm package with newer version</returns>
-        INpmPackageDependency Outdated(string name);
+        /// <returns>enumerable set of packages needing updates</returns>
+        IEnumerable<INpmPackageDependency> Outdated(string name);
 
         /// <summary>
         /// Update named package. Wraps 'npm update name'
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>true or false</returns>
-        bool Update(string name);
+        IEnumerable<INpmInstalledPackage> Update(string name);
 
         /// <summary>
         /// Uninstall named package. Wraps 'npm uninstall name'
@@ -69,5 +96,12 @@
         /// <param name="name">name of package</param>
         /// <returns>true or false</returns>
         bool Uninstall(string name);
+
+        /// <summary>
+        /// Check if package is installed. Wraps 'npm list' and looks for match
+        /// </summary>
+        /// <param name="package">name and version to install</param>
+        /// <returns>NpmInstalledPackage or null</returns>
+        INpmInstalledPackage TestInstalled(INpmPackage package);
     }
 }

@@ -1,150 +1,325 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NodejsNpm;
+﻿// -----------------------------------------------------------------------
+// <copyright file="MockNpmClient.cs" company="Microsoft">
+// Class for npm package manager unit tests
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NpmUnitTests
 {
-    class MockNpmClient : NpmClient
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using NodejsNpm;
+
+    /// <summary>
+    /// The class that emulates NpmClient and provides predictable responses to commands
+    /// </summary>
+    internal class MockNpmClient : INpmClient
     {
-        public MockNpmClient() : base()
+        /// <summary>
+        /// State used to alter output after uninstall
+        /// </summary>
+        private bool calledUninstall;
+
+        /// <summary>
+        /// The output from most recent execute
+        /// </summary>
+        private string lastExecuteOutput;
+
+        /// <summary>
+        /// The error output from most recent execute
+        /// </summary>
+        private string lastExecuteErrorText;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockNpmClient" /> class.
+        /// </summary>
+        public MockNpmClient()
         {
+            this.calledUninstall = false;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockNpmClient" /> class.
+        /// </summary>
+        /// <param name="wd">Working directory</param>
         public MockNpmClient(string wd)
-            : base(wd)
         {
-
+            this.WorkingDirectory = wd;
+            this.calledUninstall = false;
         }
 
-        public override int Execute(string cmd, string args, out string output, out string err)
+        /// <summary>
+        /// Gets or sets installation path for node
+        /// </summary>
+        public string InstallPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets relative path to NPM from node installation
+        /// </summary>
+        public string NpmRelativePath { get; set; }
+
+        /// <summary>
+        /// Gets or sets project directory used for some NPM commands
+        /// </summary>
+        public string WorkingDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets URL of remote registry. Only set if not using default NPM.
+        /// </summary>
+        public string Registry { get; set; }
+
+        /// <summary>
+        /// Gets or sets HTTP Proxy URL
+        /// </summary>
+        public string HttpProxy { get; set; }
+
+        /// <summary>
+        /// Gets or sets HTTPS Proxy URL
+        /// </summary>
+        public string HttpsProxy { get; set; }
+
+        /// <summary>
+        /// Gets or sets timeout to use for NPM commands
+        /// </summary>
+        public int Timeout { get; set; }
+
+        /// <summary>
+        /// Gets the output text from the last NPM command
+        /// </summary>
+        public string LastExecuteOutput
         {
+            get
+            {
+                return this.lastExecuteOutput;
+            }
+        }
+
+        /// <summary>
+        /// Gets the error text from the last NPM command
+        /// </summary>
+        public string LastExecuteErrorText
+        {
+            get
+            {
+                return this.lastExecuteErrorText;
+            }
+        }
+
+        /// <summary>
+        /// Execute NPM command and save output
+        /// </summary>
+        /// <param name="cmd">command name</param>
+        /// <param name="args">remainder of npm command line</param>
+        /// <returns>exit code. 0 is success</returns>
+        /// <remarks>LastExecuteOutput and LastExecuteError will be set</remarks>
+        public int Execute(string cmd, string args)
+        {
+            this.lastExecuteErrorText = string.Empty;
+            this.lastExecuteOutput = string.Empty;
             switch (cmd)
             {
                 case "--version":
-                    output = MockTestData.Version1Text();
-                    err = "";
+                    this.lastExecuteOutput = MockTestData.Version1Text();
                     return 0;
                 case "search":
-                    return execSearch(args, out output, out err);
+                    return this.ExecuteSearch(args);
                 case "list":
-                    return execList(args, out output, out err);
+                    return this.ExecuteList(args);
                 case "view":
-                    return execView(args, out output, out err);
+                    return this.ExecuteView(args);
                 case "install":
-                    return execInstall(args, out output, out err);
+                    return this.ExecuteInstall(args);
                 case "outdated":
-                    return execOutdated(args, out output, out err);
+                    return this.ExecuteOutdated(args);
                 case "update":
-                    return execUpdate(args, out output, out err);
+                    return this.ExecuteUpdate(args);
                 case "uninstall":
-                    return execUninstall(args, out output, out err);
+                    return this.ExecuteUninstall(args);
                 default:
                     break;
-
             }
-            output = "";
-            err = "";
+
+            this.lastExecuteErrorText = "Unknown command\n";
             return 0;
         }
 
-        private int execSearch(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of search command
+        /// </summary>
+        /// <param name="args">Arguments for search command</param>
+        /// <returns>return code</returns>
+        private int ExecuteSearch(string args)
         {
-            if (args == "search1")
+            if (args.StartsWith("/.*", StringComparison.InvariantCultureIgnoreCase))
             {
-                output = MockTestData.SearchResult1Text();
-                err = "";
+                this.lastExecuteOutput = MockTestData.SearchResult2Text();
                 return 0;
             }
-            output = "";
-            err = "Unknown test arg\n";
+            else if (args.StartsWith("search1", StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.lastExecuteOutput = MockTestData.SearchResult1Text();
+                return 0;
+            }
+
+            this.lastExecuteErrorText = "Unknown test arg\n";
             return 1;
         }
 
-        private int execList(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of list command
+        /// </summary>
+        /// <param name="args">Arguments for list command</param>
+        /// <returns>return code</returns>
+        private int ExecuteList(string args)
         {
-            string wd = base.WorkingDirectory;
+            string wd = this.WorkingDirectory;
             if (wd.IndexOf("project1") > 0)
             {
-                output = MockTestData.List1Text();
-                err = "";
+                this.lastExecuteOutput = MockTestData.List1Text();
                 return 0;
             }
-            output = "";
-            err = "Unknown working directory\n";
+            else if (wd.IndexOf("uninstall1") > 0)
+            {
+                if (this.calledUninstall)
+                {
+                    this.calledUninstall = false;
+                    this.lastExecuteOutput = MockTestData.ListAfterUninstallText();
+                    return 0;
+                }
+                else
+                {
+                    this.lastExecuteOutput = MockTestData.ListBeforeUninstallText();
+                    return 0;
+                }
+            }
+            else if (wd.IndexOf("outdatedmulti") > 0)
+            {
+                this.lastExecuteOutput = MockTestData.ListOutdatedMultiText();
+                return 0;
+            }
+            else if (wd.IndexOf("update1") > 0)
+            {
+                this.lastExecuteOutput = MockTestData.ListProblems1Text();
+                return 0;
+            }
+
+            this.lastExecuteErrorText = "Unknown working directory\n";
             return 1;
         }
 
-        private int execView(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of view command
+        /// </summary>
+        /// <param name="args">Arguments for view command</param>
+        /// <returns>return code</returns>
+        private int ExecuteView(string args)
         {
-            if (args == "view1")
+            if (args.StartsWith("view1", StringComparison.InvariantCultureIgnoreCase))
             {
-                output = MockTestData.View1Text();
-                err = "";
+                this.lastExecuteOutput = MockTestData.View1Text();
                 return 0;
             }
-            output = "";
-            err = "Unknown test arg\n";
+
+            this.lastExecuteErrorText = "Unknown test arg\n";
             return 1;
         }
 
-        private int execInstall(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of install command
+        /// </summary>
+        /// <param name="args">Arguments for install command</param>
+        /// <returns>return code</returns>
+        private int ExecuteInstall(string args)
         {
-            if (args == "install1")
+            if (args.StartsWith("underscore", StringComparison.InvariantCultureIgnoreCase))
             {
-                output = MockTestData.Install1Text();
-                err = "";
+                this.lastExecuteOutput = MockTestData.Install1Text();
                 return 0;
             }
-            output = "";
-            err = "Unknown test arg\n";
+            else if (args.StartsWith("install1", StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.lastExecuteOutput = MockTestData.Install1Text();
+                return 0;
+            }
+
+            this.lastExecuteErrorText = "Unknown test arg\n";
             return 1;
         }
 
-        private int execOutdated(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of outdated command
+        /// </summary>
+        /// <param name="args">Arguments for outdated command</param>
+        /// <returns>return code</returns>
+        private int ExecuteOutdated(string args)
         {
-            if (args == null)
+            string wd = this.WorkingDirectory;
+            if (wd.IndexOf("outdatedmulti") > 0)
             {
-                output = MockTestData.Outdated1Text();
-                err = "";
-                return 0;
+                if (args == null)
+                {
+                    this.lastExecuteOutput = MockTestData.OutdatedChildText();
+                    return 0;
+                }
+                else if (args.StartsWith("outdatedparent", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    this.lastExecuteOutput = MockTestData.OutdatedParentText();
+                    return 0;
+                }
             }
-            else if (args == "outdated1")
+            else
             {
-                output = MockTestData.Outdated1Text();
-                err = "";
-                return 0;
+                if (args == null)
+                {
+                    this.lastExecuteOutput = MockTestData.Outdated1Text();
+                    return 0;
+                }
+                else if (args.StartsWith("outdated1", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    this.lastExecuteOutput = MockTestData.Outdated1Text();
+                    return 0;
+                }
             }
-            output = "";
-            err = "Unknown test arg\n";
+
+            this.lastExecuteErrorText = "Unknown test arg\n";
             return 1;
         }
 
-        private int execUpdate(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of update command
+        /// </summary>
+        /// <param name="args">Arguments for update command</param>
+        /// <returns>return code</returns>
+        private int ExecuteUpdate(string args)
         {
-            if (args == "update1")
+            if (args.StartsWith("underscore", StringComparison.InvariantCultureIgnoreCase))
             {
-                output = "";
-                err = "";
+                this.lastExecuteOutput = MockTestData.Install1Text();
                 return 0;
             }
-            output = "";
-            err = "Unknown test arg\n";
+
+            this.lastExecuteErrorText = "Unknown test arg\n";
             return 1;
         }
 
-        private int execUninstall(string args, out string output, out string err)
+        /// <summary>
+        /// Mock execution of uninstall command
+        /// </summary>
+        /// <param name="args">Arguments for uninstall command</param>
+        /// <returns>return code</returns>
+        private int ExecuteUninstall(string args)
         {
-            if (args == "uninstall1")
+            if (args.StartsWith("uninstall1", StringComparison.InvariantCultureIgnoreCase))
             {
-                output = "";
-                err = "";
+                this.calledUninstall = true;
+                this.lastExecuteOutput = string.Empty;
                 return 0;
             }
-            output = "";
-            err = "Unknown test arg\n";
+
+            this.lastExecuteErrorText = "Unknown test arg\n";
             return 1;
         }
-
     }
 }

@@ -1,8 +1,16 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmSerialize.cs" company="Microsoft">
+// Class for npm package manager serialization
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Security;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web.Script.Serialization;
@@ -10,21 +18,93 @@
     /// <summary>
     /// class for serialization from npm to objects
     /// </summary>
-    internal class NpmSerialize : INpmSerialize
+    [SecurityCritical]
+    public class NpmSerialize : INpmSerialize
     {
+        /// <summary>
+        /// Directory name inserted for each dependency level
+        /// </summary>
+        private const string ModuleDir = "node_modules";
+
+        /// <summary>
+        /// Directory name inserted for each dependency level
+        /// </summary>
+        private const string ModuleSeparator = "/node_modules/";
+
+        /// <summary>
+        /// Build path for specified dependency
+        /// </summary>
+        /// <param name="depends">dependency name</param>
+        /// <returns>Relative path to dependency</returns>
+        public static string ConvertDependToPath(string depends)
+        {
+            if (depends == null)
+            {
+                return null;
+            }
+
+            char[] seps = new char[] { '/' };
+            string[] dependencies = depends.Split(seps);
+            string relative = ".";
+
+            // keep adding module path to root
+            foreach (string depend in dependencies)
+            {
+                relative = Path.Combine(relative, ModuleDir, depend);
+            }
+
+            return relative;
+        }
+
+        /// <summary>
+        /// Build path for specified dependency
+        /// </summary>
+        /// <param name="relativePath">module path</param>
+        /// <returns>Path to dependency</returns>
+        public static string ConvertPathToDepends(string relativePath)
+        {
+            if (relativePath == null)
+            {
+                return null;
+            }
+
+            string[] moduleSeparator = new string[] { ModuleSeparator };
+            string[] modules = relativePath.Split(moduleSeparator, StringSplitOptions.RemoveEmptyEntries);
+            string depends = string.Empty;
+
+            foreach (string module in modules)
+            {
+                if (module != ".")
+                {
+                    if (string.IsNullOrWhiteSpace(depends))
+                    {
+                        depends = module;
+                    }
+                    else
+                    {
+                        depends = depends + "/" + module;
+                    }
+                }
+            }
+
+            return depends;
+        }
+
         /// <summary>
         /// converts npm list output to NpmInstalledPackage
         /// </summary>
-        /// <param name="jsonlist">text output</param>
-        /// <returns>enumarable NpmInstalledPackage properties</returns>
-        public INpmInstalledPackage FromListInstalled(string jsonlist)
+        /// <param name="listJson">text output</param>
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        [SecurityCritical]
+        public IEnumerable<INpmInstalledPackage> FromListInstalled(string listJson)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
-            INpmInstalledPackage installed = null;
+            List<INpmInstalledPackage> installed = new List<INpmInstalledPackage>();
             Dictionary<string, object> listObj = null;
+
             try
             {
-                listObj = serializer.Deserialize<Dictionary<string, object>>(jsonlist);
+                listObj = serializer.Deserialize<Dictionary<string, object>>(listJson);
             }
             catch (InvalidOperationException ex)
             {
@@ -35,9 +115,9 @@
             {
                 if (listObj != null)
                 {
-                    object name;
+                    object name = string.Empty;
                     listObj.TryGetValue("name", out name);
-                    installed = this.InstalledPackageFromDictionary(name as string, listObj);
+                    this.InstalledPackageFromDictionary(installed, name as string, string.Empty, listObj);
                 }
             }
             catch (Exception ex)
@@ -49,11 +129,51 @@
         }
 
         /// <summary>
+        /// parse npm list output for matching NpmInstalledPackage
+        /// </summary>
+        /// <param name="listJson">text output</param>
+        /// <param name="package">Installed package with name to match</param>
+        /// <returns>NpmInstalledPackage properties or null</returns>
+        [SecurityCritical]
+        public INpmInstalledPackage FromListMatchInstalled(string listJson, INpmPackage package)
+        {
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            INpmInstalledPackage matched = null;
+            Dictionary<string, object> listObj = null;
+
+            try
+            {
+                listObj = serializer.Deserialize<Dictionary<string, object>>(listJson);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException("Failed to parse output from list command", ex);
+            }
+
+            try
+            {
+                if (listObj != null)
+                {
+                    object name = string.Empty;
+                    listObj.TryGetValue("name", out name);
+                    matched = this.MatchPackageFromDictionary(package, name as string, string.Empty, listObj);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to parse output from list command", ex);
+            }
+
+            return matched;
+        }
+
+        /// <summary>
         /// convert npm view output to INpmRemotePackage
         /// </summary>
-        /// <param name="jsonview">text output</param>
+        /// <param name="viewJson">text output</param>
         /// <returns>INpmRemotePackage with property values</returns>
-        public INpmRemotePackage FromView(string jsonview)
+        [SecurityCritical]
+        public INpmRemotePackage FromView(string viewJson)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             INpmRemotePackage view = null;
@@ -61,7 +181,7 @@
 
             try
             {
-                viewObj = serializer.Deserialize<Dictionary<string, object>>(jsonview);
+                viewObj = serializer.Deserialize<Dictionary<string, object>>(viewJson);
             }
             catch (InvalidOperationException ex)
             {
@@ -90,35 +210,21 @@
         }
 
         /// <summary>
-        /// convert missing info from npm list output to NpmInstalledPackage enumeration
-        /// </summary>
-        /// <param name="jsonlist">text output</param>
-        /// <returns>enumarable NpmInstalledPackage properties</returns>
-        public IEnumerable<INpmInstalledPackage> FromListMissing(string jsonlist)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// convert outdated info from npm list output to NpmInstalledPackage enumeration
-        /// </summary>
-        /// <param name="jsonlist">text output</param>
-        /// <returns>enumarable NpmInstalledPackage properties</returns>
-        public IEnumerable<INpmInstalledPackage> FromListOutdated(string jsonlist)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// convert npm outdated output to NpmPackageDependency enumeration
         /// </summary>
         /// <param name="outdated">text output</param>
-        /// <returns>enumarable INpmPackageDependency properties</returns>
+        /// <returns>enumerable INpmPackageDependency properties</returns>
+        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> FromOutdatedDependency(string outdated)
         {
+            if (outdated == null)
+            {
+                return null;
+            }
+
             List<INpmPackageDependency> depends = new List<INpmPackageDependency>();
             char[] seps = new char[] { '\n' };
-            string[] lines = outdated.Split(seps, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = outdated.Trim().Split(seps, StringSplitOptions.RemoveEmptyEntries);
 
             seps = new char[] { ' ' };
             foreach (string line in lines)
@@ -158,7 +264,8 @@
         /// convert npm search output to INpmSearchResultPackage enumeration
         /// </summary>
         /// <param name="output">text output</param>
-        /// <returns>enumarable INpmSearchResultPackage properties</returns>
+        /// <returns>enumerable INpmSearchResultPackage properties</returns>
+        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> FromSearchResult(string output)
         {
             List<INpmSearchResultPackage> results = new List<INpmSearchResultPackage>();
@@ -200,7 +307,10 @@
                     if (m.Groups.Count > 4)
                     {
                         date = m.Groups[4].ToString();
-                        DateTime.TryParse(date, out dateParsed);
+                        if (!DateTime.TryParse(date, out dateParsed))
+                        {
+                            dateParsed = DateTime.Now;
+                        }
                     }
 
                     if (m.Groups.Count > 5)
@@ -224,41 +334,71 @@
         }
 
         /// <summary>
-        /// convert npm install output to INpmPackage enumeration
+        /// convert npm install output to INpmInstalledPackage enumeration
         /// </summary>
         /// <param name="output">text output</param>
-        /// <returns>enumarable INpmPackage properties</returns>
-        public IEnumerable<INpmPackage> FromInstall(string output)
+        /// <returns>enumerable INpmInstalledPackage properties</returns>
+        [SecurityCritical]
+        public IEnumerable<INpmInstalledPackage> FromInstall(string output)
         {
-            List<INpmPackage> installs = new List<INpmPackage>();
-            char[] seps = new char[] { '\n' };
-            string[] lines = output.Split(seps, StringSplitOptions.RemoveEmptyEntries);
-
-            seps = new char[] { ' ' };
-            foreach (string line in lines)
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            List<INpmInstalledPackage> installs = new List<INpmInstalledPackage>();
+            Dictionary<string, object> installObj = null;
+            try
             {
-                string[] tokens = line.Split(seps, StringSplitOptions.RemoveEmptyEntries);
-                int tokenCount = tokens.Length;
+                installObj = serializer.Deserialize<Dictionary<string, object>>(output);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException("Failed to parse output from install command", ex);
+            }
 
-                if (tokenCount > 0)
+            try
+            {
+                if (installObj != null)
                 {
-                    NpmPackage package;
-                    seps = new char[] { '@' };
-                    string[] nameVersion = tokens[0].Split(seps);
-                    if (nameVersion.Length > 1)
+                    foreach (KeyValuePair<string, object> module in installObj)
                     {
-                        package = new NpmPackage(nameVersion[0], nameVersion[1]);
+                        NpmSerialize.InstalledPackagesFromInstalledDictionary(installs, module.Value);
                     }
-                    else
-                    {
-                        package = new NpmPackage(nameVersion[0], null);
-                    }
-
-                    installs.Add(package);
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to convert output from install command to object", ex);
             }
 
             return installs;
+        }
+
+        /// <summary>
+        /// Set package name and version from string name@version 
+        /// </summary>
+        /// <param name="package">INpmPackage to update</param>
+        /// <param name="nameVersion">string name or name@version</param>
+        [SecurityCritical]
+        private static void FillPackageFromNameVersion(INpmPackage package, string nameVersion)
+        {
+            if (nameVersion == null)
+            {
+                package.Name = null;
+                package.Version = null;
+            }
+            else
+            {
+                char[] seps = new char[] { '@' };
+                string[] nameAndVersion = nameVersion.Split(seps);
+                if (nameAndVersion.Length > 1)
+                {
+                    package.Name = nameAndVersion[0];
+                    package.Version = nameAndVersion[1];
+                }
+                else
+                {
+                    package.Name = nameAndVersion[0];
+                    package.Version = null;
+                }
+            }
         }
 
         /// <summary>
@@ -267,6 +407,7 @@
         /// <param name="name">name of package</param>
         /// <param name="viewObj">dictionary at root of object</param>
         /// <returns>NpmRemotePackage instance</returns>
+        [SecurityCritical]
         private static NpmRemotePackage RemotePackageFromDictionary(string name, Dictionary<string, object> viewObj)
         {
             NpmRemotePackage remote = new NpmRemotePackage();
@@ -294,7 +435,7 @@
 
             if (viewObj.ContainsKey("homepage"))
             {
-                remote.HomepageUrl = viewObj["homepage"] as string;
+                remote.Homepage = viewObj["homepage"] as string;
             }
 
             if (viewObj.ContainsKey("author"))
@@ -355,6 +496,7 @@
         /// </summary>
         /// <param name="obj">object to convert</param>
         /// <returns>A List of strings</returns>
+        [SecurityCritical]
         private static List<string> ConvertStringArray(object obj)
         {
             List<string> strings = null;
@@ -388,6 +530,7 @@
         /// <param name="key">The string key of the dependency</param>
         /// <param name="value">The object value</param>
         /// <returns>A package dependency</returns>
+        [SecurityCritical]
         private static NpmPackageDependency ConvertKeyValueToDependency(string key, object value)
         {
             NpmPackageDependency dependency = new NpmPackageDependency();
@@ -401,6 +544,7 @@
         /// </summary>
         /// <param name="obj">The parsed json object to convert</param>
         /// <returns>A List of package dependencies</returns>
+        [SecurityCritical]
         private static List<NpmPackageDependency> ConvertDependencies(object obj)
         {
             Dictionary<string, object> deps = obj as Dictionary<string, object>;
@@ -424,6 +568,7 @@
         /// </summary>
         /// <param name="obj">The object to convert</param>
         /// <returns>A reference with type and url</returns>
+        [SecurityCritical]
         private static NpmReference ConvertReference(object obj)
         {
             Dictionary<string, object> dictionary = obj as Dictionary<string, object>;
@@ -447,20 +592,99 @@
         }
 
         /// <summary>
+        /// Build installed package list from Dictionary based on install json
+        /// </summary>
+        /// <param name="parent">Parent list for this object</param>
+        /// <param name="child">Child object is dictionary from json deserialize</param>
+        [SecurityCritical]
+        private static void InstalledPackagesFromInstalledDictionary(
+                                            List<INpmInstalledPackage> parent,
+                                            object child)
+        {
+            Dictionary<string, object> childObj = child as Dictionary<string, object>;
+            if (childObj == null)
+            {
+                return;
+            }
+
+            NpmInstalledPackage installed = new NpmInstalledPackage();
+            if (childObj.ContainsKey("what"))
+            {
+                NpmSerialize.FillPackageFromNameVersion(installed, childObj["what"] as string);
+            }
+
+            if (childObj.ContainsKey("parentDir"))
+            {
+                string parentDirectory = childObj["parentDir"] as string;
+                if (parentDirectory != null)
+                {
+                    installed.DependentPath = NpmSerialize.ConvertPathToDepends(parentDirectory);
+                }
+            }
+            else
+            {
+                installed.DependentPath = string.Empty;
+            }
+
+            installed.IsMissing = false;
+            installed.IsOutdated = false;
+
+            if (childObj.ContainsKey("children"))
+            {
+                ArrayList array = childObj["children"] as ArrayList;
+                if (array != null && array.Count > 0)
+                {
+                    installed.HasDependencies = true;
+
+                    foreach (object item in array)
+                    {
+                        NpmSerialize.InstalledPackagesFromInstalledDictionary(parent, item);
+                    }
+                }
+            }
+
+            parent.Add(installed);
+        }
+
+        /// <summary>
         /// Deserialize the parsed json results to a package
         /// </summary>
+        /// <param name="parent">Parent list for this object</param>
         /// <param name="name">name of package</param>
+        /// <param name="dependentPath">list of parents delimited by "/"</param>
         /// <param name="listObj">dictionary at root of package</param>
-        /// <returns>Installed package object</returns>
         /// <remarks>This is called recursively as a dependency is a package</remarks>
-        private NpmInstalledPackage InstalledPackageFromDictionary(string name, Dictionary<string, object> listObj)
+        [SecurityCritical]
+        private void InstalledPackageFromDictionary(
+                                                    List<INpmInstalledPackage> parent,
+                                                    string name,
+                                                    string dependentPath,
+                                                    Dictionary<string, object> listObj)
         {
             NpmInstalledPackage installed = new NpmInstalledPackage();
             installed.Name = name;
+            installed.DependentPath = dependentPath;
             if (listObj.ContainsKey("version"))
             {
                 installed.Version = listObj["version"] as string;
             }
+
+            if (listObj.ContainsKey("missing"))
+            {
+                installed.IsMissing = true;
+            }
+
+            if (listObj.ContainsKey("invalid"))
+            {
+                installed.IsOutdated = true;
+            }
+
+            if (listObj.ContainsKey("dependencies"))
+            {
+                installed.HasDependencies = true;
+            }
+
+            parent.Add(installed);
 
             if (listObj.ContainsKey("dependencies"))
             {
@@ -473,61 +697,92 @@
 
                 if (dependDict != null && dependDict.Count > 0)
                 {
-                    List<NpmPackageDependency> missingList = null;
-                    List<NpmPackageDependency> invalidList = null;
-                    List<NpmInstalledPackage> dependencyList = new List<NpmInstalledPackage>(dependDict.Count);
+                    string mypath = string.IsNullOrWhiteSpace(dependentPath) ? 
+                                                        installed.Name :
+                                                        dependentPath + "/" + installed.Name;
                     foreach (KeyValuePair<string, object> pair in dependDict)
                     {
                         Dictionary<string, object> val = pair.Value as Dictionary<string, object>;
                         if (val != null)
                         {
-                            object obj;
-                            if (val.TryGetValue("missing", out obj))
-                            {
-                                if (missingList == null)
-                                {
-                                    missingList = new List<NpmPackageDependency>();
-                                }
-
-                                NpmPackageDependency dependency = ConvertKeyValueToDependency(pair.Key, obj);
-                                missingList.Add(dependency);
-                                continue;
-                            }
-
-                            if (val.TryGetValue("invalid", out obj))
-                            {
-                                if (invalidList == null)
-                                {
-                                    invalidList = new List<NpmPackageDependency>();
-                                }
-
-                                NpmPackageDependency dependency = ConvertKeyValueToDependency(pair.Key, obj);
-                                invalidList.Add(dependency);
-                                continue;
-                            }
-
-                            NpmInstalledPackage installedDepends = this.InstalledPackageFromDictionary(pair.Key, val);
-                            if (installedDepends != null)
-                            {
-                                dependencyList.Add(installedDepends);
-                            }
+                            this.InstalledPackageFromDictionary(parent, pair.Key, mypath, val);
                         }
                     }
+                }
+            }
+        }
 
-                    installed.InstalledDependencies = dependencyList;
-                    if (missingList != null)
-                    {
-                        installed.MissingDependencies = missingList;
-                    }
+        /// <summary>
+        /// Deserialize the parsed json results and try to match package
+        /// </summary>
+        /// <param name="package">Package that has name to match</param>
+        /// <param name="name">name of package</param>
+        /// <param name="dependentPath">list of parents delimited by "/"</param>
+        /// <param name="listObj">dictionary at root of package</param>
+        /// <returns>Installed package object</returns>
+        /// <remarks>This is called recursively as a dependency is a package</remarks>
+        [SecurityCritical]
+        private NpmInstalledPackage MatchPackageFromDictionary(
+                                                    INpmPackage package,
+                                                    string name,
+                                                    string dependentPath,
+                                                    Dictionary<string, object> listObj)
+        {
+            // if name matches and not missing, create package and return it
+            if (package.Name == name && !listObj.ContainsKey("missing"))
+            {
+                NpmInstalledPackage installed = new NpmInstalledPackage();
+                installed.Name = name;
+                installed.DependentPath = dependentPath;
+                if (listObj.ContainsKey("version"))
+                {
+                    installed.Version = listObj["version"] as string;
+                }
 
-                    if (invalidList != null)
+                if (listObj.ContainsKey("invalid"))
+                {
+                    installed.IsOutdated = true;
+                }
+
+                if (listObj.ContainsKey("dependencies"))
+                {
+                    installed.HasDependencies = true;
+                }
+
+                return installed;
+            }
+
+            // look in the dependencies
+            if (listObj.ContainsKey("dependencies"))
+            {
+                IDictionary<string, object> dependDict = null;
+                object dependecyObj;
+                if (listObj.TryGetValue("dependencies", out dependecyObj))
+                {
+                    dependDict = dependecyObj as IDictionary<string, object>;
+                }
+
+                if (dependDict != null && dependDict.Count > 0)
+                {
+                    string mypath = string.IsNullOrWhiteSpace(dependentPath) ?
+                                                        name :
+                                                        dependentPath + "/" + name;
+                    foreach (KeyValuePair<string, object> pair in dependDict)
                     {
-                        installed.OutdatedDependencies = invalidList;
+                        Dictionary<string, object> val = pair.Value as Dictionary<string, object>;
+                        if (val != null)
+                        {
+                            NpmInstalledPackage installed = this.MatchPackageFromDictionary(package, pair.Key, mypath, val);
+                            if (installed != null)
+                            {
+                                return installed;
+                            }
+                        }
                     }
                 }
             }
 
-            return installed;
+            return null;
         }
     }
 }

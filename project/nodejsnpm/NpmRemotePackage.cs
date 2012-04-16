@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="NpmRemotePackage.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="NpmRemotePackage.cs" company="Microsoft">
+// Class for some npm package manager Remote Package representation
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -9,12 +9,13 @@ namespace NodejsNpm
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security;
     using System.Text;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// NpmPackage plus properties about the package as stored in the repository
     /// </summary>
-    internal class NpmRemotePackage : INpmRemotePackage
+    public class NpmRemotePackage : INpmRemotePackage
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmRemotePackage" /> class.
@@ -26,187 +27,206 @@ namespace NodejsNpm
         /// <summary>
         /// Gets or sets name of Npm object
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets version of Npm object if known
         /// </summary>
-        public string Version { get; set; }
+        public string Version
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the text description
         /// </summary>
-        public string Description { get; set; }
+        public string Description
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the published versions
         /// </summary>
-        public IEnumerable<string> Versions { get; set; }
+        public IEnumerable<string> Versions
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the names of maintainers
         /// </summary>
-        public IEnumerable<string> Maintainers { get; set; }
+        public IEnumerable<string> Maintainers
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the names of contributors
         /// </summary>
-        public IEnumerable<string> Contributors { get; set; }
+        public IEnumerable<string> Contributors
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the keywords
         /// </summary>
-        public IEnumerable<string> Keywords { get; set; }
+        public IEnumerable<string> Keywords
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the URL for home page of project
         /// </summary>
-        public string HomepageUrl { get; set; }
+        public string Homepage
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the author of project
         /// </summary>
-        public string Author { get; set; }
+        public string Author
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the set of required dependencies
         /// </summary>
-        public IEnumerable<INpmPackageDependency> Dependencies { get; set; }
+        public IEnumerable<INpmPackageDependency> Dependencies
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the set of development dependencies
         /// </summary>
-        public IEnumerable<INpmPackageDependency> DevDependencies { get; set; }
+        public IEnumerable<INpmPackageDependency> DevDependencies
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the set of optional dependencies
         /// </summary>
-        public IEnumerable<INpmPackageDependency> OptionalDependencies { get; set; }
+        public IEnumerable<INpmPackageDependency> OptionalDependencies
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the reference to license
         /// </summary>
-        public INpmReference License { get; set; }
+        public INpmReference License
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the reference to remote repository where it is published
         /// </summary>
-        public INpmReference Repository { get; set; }
+        public INpmReference Repository
+        {
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
 
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
         /// <param name="package">NpmRemotePackage to compare</param>
-        /// <param name="diff">Output string has name of first mismatch</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmRemotePackage package, out string diff)
+        public bool IsSame(INpmRemotePackage package)
         {
-            diff = string.Empty;
+            if (package == null)
+            {
+                return false;
+            }
+
             if (this.Name != package.Name)
             {
-                diff = "Name";
                 return false;
             }
 
             if (this.Version != package.Version)
             {
-                diff = "Version";
                 return false;
             }
 
             if (this.Description != package.Description)
             {
-                diff = "Description";
                 return false;
             }
 
-            if ((this.Versions != null && package.Versions == null) ||
-                (this.Versions == null && package.Versions != null))
+            if (!NpmPackage.IsSameStringEnumeration(this.Versions, package.Versions))
             {
-                diff = "Versions";
                 return false;
             }
 
-            if (this.Versions != null)
+            if (!NpmPackage.IsSameStringEnumeration(this.Maintainers, package.Maintainers))
             {
-                if (this.Versions.Count<string>() !=
-                    package.Versions.Count<string>())
-                {
-                    diff = "Versions";
-                    return false;
-                }
-
-                foreach (string version in package.Versions)
-                {
-                    if (!this.Versions.Contains(version))
-                    {
-                        diff = "Versions";
-                        return false;
-                    }
-                }
-            }
-
-            if ((this.Maintainers != null && package.Maintainers == null) ||
-                (this.Maintainers == null && package.Maintainers != null))
-            {
-                diff = "Maintainers";
                 return false;
             }
 
-            if (this.Maintainers != null)
+            if (!NpmPackage.IsSameStringEnumeration(this.Contributors, package.Contributors))
             {
-                if (this.Maintainers.Count<string>() !=
-                    package.Maintainers.Count<string>())
-                {
-                    diff = "Maintainers";
-                    return false;
-                }
-
-                foreach (string maintainer in package.Maintainers)
-                {
-                    if (!this.Maintainers.Contains(maintainer))
-                    {
-                        diff = "Maintainers";
-                        return false;
-                    }
-                }
-            }
-
-            if ((this.Contributors != null && package.Contributors == null) ||
-                (this.Contributors == null && package.Contributors != null))
-            {
-                diff = "Contributors";
                 return false;
             }
 
-            if (this.Contributors != null)
+            if (this.Homepage != package.Homepage)
             {
-                if (this.Contributors.Count<string>() !=
-                    package.Contributors.Count<string>())
-                {
-                    diff = "Contributors";
-                    return false;
-                }
-
-                foreach (string contributor in package.Contributors)
-                {
-                    if (!this.Contributors.Contains(contributor))
-                    {
-                        diff = "Contributors";
-                        return false;
-                    }
-                }
-            }
-
-            if (this.HomepageUrl != package.HomepageUrl)
-            {
-                diff = "HomepageUrl";
                 return false;
             }
 
             if (this.Author != package.Author)
             {
-                diff = "Author";
                 return false;
             }
 

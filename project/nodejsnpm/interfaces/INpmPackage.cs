@@ -1,146 +1,270 @@
-﻿namespace NodejsNpm
+﻿// -----------------------------------------------------------------------
+// <copyright file="INpmPackage.cs" company="Microsoft">
+// Interface for some npm package manager data classes
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NodejsNpm
 {
     using System;
     using System.Collections.Generic;
+    using System.Security;
     using System.Text;
 
     /// <summary>
     /// INpmPackage has name and optional version
     /// </summary>
-    internal interface INpmPackage
+    public interface INpmPackage
     {
         /// <summary>
         /// Gets or sets name of Npm object
         /// </summary>
-        string Name { get; set; }
+        string Name
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets version of Npm object if known
         /// </summary>
-        string Version { get; set; }
+        string Version
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
     /// INpmPackage plus version range string
     /// </summary>
-    internal interface INpmPackageDependency : INpmPackage
+    public interface INpmPackageDependency : INpmPackage
     {
         /// <summary>
         /// Gets or sets the version range of supported dependency
         /// </summary>
-        string VersionRange { get; set; }
+        string VersionRange
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
     /// INpmPackage plus dependencies for installed package
     /// </summary>
-    internal interface INpmInstalledPackage : INpmPackage
+    public interface INpmInstalledPackage : INpmPackage
     {
         /// <summary>
-        /// Gets or sets the set of installed dependencies
+        /// Gets or sets the '/' delimited parents for this installation
         /// </summary>
-        IEnumerable<INpmInstalledPackage> InstalledDependencies { get; set; }
+        string DependentPath
+        {
+            get;
+            set;
+        }
 
         /// <summary>
-        /// Gets or sets the set of dependencies that are not installed
+        /// Gets or sets a value indicating whether the package is missing
         /// </summary>
-        IEnumerable<INpmPackageDependency> MissingDependencies { get; set; }
+        bool IsMissing
+        {
+            get;
+            set;
+        }
 
         /// <summary>
-        /// Gets or sets the set of dependencies that need to be updated
+        /// Gets or sets a value indicating whether the package is outdated
         /// </summary>
-        IEnumerable<INpmPackageDependency> OutdatedDependencies { get; set; }
+        bool IsOutdated
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the package has dependencies
+        /// </summary>
+        bool HasDependencies
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
     /// INpmPackage on remote repository. Most properties are optional
     /// </summary>
-    internal interface INpmRemotePackage : INpmPackage
+    public interface INpmRemotePackage : INpmPackage
     {
         /// <summary>
         /// Gets or sets the text description
         /// </summary>
-        string Description { get; set; }
+        string Description
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the published versions
         /// </summary>
-        IEnumerable<string> Versions { get; set; }
+        IEnumerable<string> Versions
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the names of maintainers
         /// </summary>
-        IEnumerable<string> Maintainers { get; set; }
+        IEnumerable<string> Maintainers
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the names of contributors
         /// </summary>
-        IEnumerable<string> Contributors { get; set; }
+        IEnumerable<string> Contributors
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the keywords
         /// </summary>
-        IEnumerable<string> Keywords { get; set; }
+        IEnumerable<string> Keywords
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the URL for home page of project
         /// </summary>
-        string HomepageUrl { get; set; }
+        string Homepage
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the author of project
         /// </summary>
-        string Author { get; set; }
+        string Author
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the set of required dependencies
         /// </summary>
-        IEnumerable<INpmPackageDependency> Dependencies { get; set; }
+        IEnumerable<INpmPackageDependency> Dependencies
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the set of development dependencies
         /// </summary>
-        IEnumerable<INpmPackageDependency> DevDependencies { get; set; }
+        IEnumerable<INpmPackageDependency> DevDependencies
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the set of optional dependencies
         /// </summary>
-        IEnumerable<INpmPackageDependency> OptionalDependencies { get; set; }
+        IEnumerable<INpmPackageDependency> OptionalDependencies
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the reference to license
         /// </summary>
-        INpmReference License { get; set; }
+        INpmReference License
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the reference to remote repository where it is published
         /// </summary>
-        INpmReference Repository { get; set; }
+        INpmReference Repository
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
     /// INpmPackage plus properties from search result
     /// </summary>
-    internal interface INpmSearchResultPackage : INpmPackage
+    public interface INpmSearchResultPackage : INpmPackage
     {
         /// <summary>
         /// Gets the text description
         /// </summary>
-        string Description { get; }
+        string Description
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the author of project
         /// </summary>
-        string Author { get; }
+        string Author
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the keywords
         /// </summary>
-        string[] Keywords { get; }
+        IEnumerable<string> Keywords
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the date of last publish
         /// </summary>
-        DateTime Date { get; }
+        DateTime LatestDate
+        {
+            get;
+        }
+    }
+
+    /// <summary>
+    /// Npm reference has a type and URL
+    /// </summary>
+    public interface INpmReference
+    {
+        /// <summary>
+        /// Gets or sets the reference type
+        /// </summary>
+        string Type
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the reference URL
+        /// </summary>
+        string Reference
+        {
+            get;
+            set;
+        }
     }
 }

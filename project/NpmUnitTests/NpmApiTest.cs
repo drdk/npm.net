@@ -1,34 +1,43 @@
-﻿namespace NpmUnitTests
+﻿// -----------------------------------------------------------------------
+// <copyright file="NpmApiTest.cs" company="Microsoft">
+// Class for npm package manager unit tests
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NpmUnitTests
 {
-    using NodejsNpm;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NodejsNpm;
 
     /// <summary>
-    ///This is a test class for NpmApiTest and is intended
-    ///to contain all NpmApiTest Unit Tests
-    ///</summary>
-    [TestClass()]
+    /// This is a test class for NpmApiTest and is intended
+    /// to contain all NpmApiTest Unit Tests
+    /// </summary>
+    [TestClass]
     public class NpmApiTest
     {
-
+        /// <summary>
+        /// Value used by test framework
+        /// </summary>
         private TestContext testContextInstance;
 
         /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
+        /// Gets or sets the test context which provides
+        /// information about and functionality for the current test run.
+        /// </summary>
         public TestContext TestContext
         {
             get
             {
-                return testContextInstance;
+                return this.testContextInstance;
             }
+
             set
             {
-                testContextInstance = value;
+                this.testContextInstance = value;
             }
         }
 
@@ -62,11 +71,10 @@
         //
         #endregion
 
-
         /// <summary>
-        ///A test for NpmApi Constructor
-        ///</summary>
-        [TestMethod()]
+        /// A test for NpmApi Constructor
+        /// </summary>
+        [TestMethod]
         public void NpmApiConstructorTest()
         {
             string wd = string.Empty;
@@ -77,9 +85,9 @@
         }
 
         /// <summary>
-        ///A test for GetInstalledVersion
-        ///</summary>
-        [TestMethod()]
+        /// A test for GetInstalledVersion
+        /// </summary>
+        [TestMethod]
         public void GetInstalledVersionTest()
         {
             string wd = string.Empty;
@@ -93,9 +101,9 @@
         }
 
         /// <summary>
-        ///A test for Install
-        ///</summary>
-        [TestMethod()]
+        /// A test for Install
+        /// </summary>
+        [TestMethod]
         public void InstallTest()
         {
             string wd = string.Empty;
@@ -103,63 +111,73 @@
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             NpmPackage package = new NpmPackage("install1", null);
-            List<NpmPackage> expected = MockTestData.Install1Expected();
-            IEnumerable<INpmPackage> actual;
+            List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
+            IEnumerable<INpmInstalledPackage> actual;
             actual = target.Install(package);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
-            foreach (INpmPackage actualItem in actual)
+            foreach (INpmInstalledPackage actualItem in actual)
             {
-                string diff;
-                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "Install value differs in " + diff);
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Install value differs");
                 index++;
             }
         }
 
         /// <summary>
-        ///A test for List
-        ///</summary>
-        [TestMethod()]
+        /// A test for List
+        /// </summary>
+        [TestMethod]
         public void ListTest()
         {
-            string wd = "/root/project1";
+            string wd = "c:\\root\\project1";
             string registry = string.Empty;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
-            NpmInstalledPackage expected = MockTestData.List1Expected();
-            INpmInstalledPackage actual;
+            List<NpmInstalledPackage> expected = MockTestData.List1Expected();
+            IEnumerable<INpmInstalledPackage> actual;
             actual = target.List();
             Assert.IsNotNull(actual);
-            string diff;
-            Assert.IsTrue(expected.IsSame(actual, out diff), "ListInstalled value differs in " + diff);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.IsTrue(expected[index].IsSame(actualItem), "ListInstalled value differs");
+                index++;
+            }
         }
 
         /// <summary>
-        ///A test for Outdated
-        ///</summary>
-        [TestMethod()]
+        /// A test for Outdated
+        /// </summary>
+        [TestMethod]
         public void OutdatedTest()
         {
-            string wd = "/root/project1";
+            string wd = "c:\\root\\project1";
             string registry = string.Empty;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string name = "outdated1";
-            NpmPackageDependency expected = MockTestData.OutdatedSingle1Expected();
-            INpmPackageDependency actual;
+            List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
+            IEnumerable<INpmPackageDependency> actual;
             actual = target.Outdated(name);
-            string diff;
-            Assert.IsTrue(expected.IsSame(actual, out diff), "Outdated package dependency value differs in " + diff);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (INpmPackageDependency actualItem in actual)
+            {
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Outdated package dependency value differs");
+                index++;
+            }
         }
 
         /// <summary>
-        ///A test for Outdated
-        ///</summary>
-        [TestMethod()]
+        /// A test for Outdated
+        /// </summary>
+        [TestMethod]
         public void OutdatedTest1()
         {
-            string wd = "/root/project1";
+            string wd = "c:\\root\\project1";
             string registry = string.Empty;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
@@ -167,20 +185,19 @@
             IEnumerable<INpmPackageDependency> actual;
             actual = target.Outdated();
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmPackageDependency>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
             foreach (INpmPackageDependency actualItem in actual)
             {
-                string diff;
-                Assert.IsTrue(expected[index].IsSame(actualItem, out diff), "Outdated package dependency value differs in " + diff);
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Outdated package dependency value differs");
                 index++;
             }
         }
 
         /// <summary>
-        ///A test for Search
-        ///</summary>
-        [TestMethod()]
+        /// A test for Search
+        /// </summary>
+        [TestMethod]
         public void SearchTest()
         {
             string wd = string.Empty;
@@ -192,23 +209,22 @@
             IEnumerable<INpmSearchResultPackage> actual;
             actual = target.Search(searchTerms);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmSearchResultPackage>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
             foreach (INpmSearchResultPackage result in actual)
             {
-                string diff;
-                Assert.IsTrue(expected[index].IsSame(result, out diff), "Search result value differs in " + diff);
+                Assert.IsTrue(expected[index].IsSame(result), "Search result value differs");
                 index++;
             }
         }
 
         /// <summary>
-        ///A test for Uninstall
-        ///</summary>
-        [TestMethod()]
+        /// A test for Uninstall
+        /// </summary>
+        [TestMethod]
         public void UninstallTest()
         {
-            string wd = "/root/project1";
+            string wd = "c:\\root\\project1";
             string registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
@@ -220,26 +236,32 @@
         }
 
         /// <summary>
-        ///A test for Update
-        ///</summary>
-        [TestMethod()]
+        /// A test for Update
+        /// </summary>
+        [TestMethod]
         public void UpdateTest()
         {
-            string wd = "/root/project1";
+            string wd = "c:\\root\\project1";
             string registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
-            string name = "update1";
-            bool expected = true;
-            bool actual;
+            string name = "underscore";
+            List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
+            IEnumerable<INpmInstalledPackage> actual;
             actual = target.Update(name);
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (INpmInstalledPackage actualItem in actual)
+            {
+                Assert.IsTrue(expected[index].IsSame(actualItem), "Install value differs");
+                index++;
+            }
         }
 
         /// <summary>
-        ///A test for View
-        ///</summary>
-        [TestMethod()]
+        /// A test for View
+        /// </summary>
+        [TestMethod]
         public void ViewTest()
         {
             string wd = string.Empty;
@@ -250,8 +272,32 @@
             NpmRemotePackage expected = MockTestData.View1Expected();
             INpmRemotePackage actual;
             actual = target.View(name);
-            string diff;
-            Assert.IsTrue(expected.IsSame(actual, out diff), "View value differs in " + diff);
+            Assert.IsTrue(expected.IsSame(actual), "View value differs");
+        }
+
+        /// <summary>
+        /// A test for TestInstalled
+        /// </summary>
+        [TestMethod]
+        public void TestInstalledTest()
+        {
+            string wd = "c:\\root\\project1";
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            NpmPackage package = MockTestData.List1MatchInstalledPackage();
+            NpmInstalledPackage expected = MockTestData.List1MatchInstalledExpected();
+            INpmInstalledPackage actual;
+            actual = target.TestInstalled(package);
+            if (expected == null)
+            {
+                Assert.AreEqual(expected, actual);
+            }
+            else
+            {
+                Assert.IsNotNull(actual);
+                Assert.IsTrue(expected.IsSame(actual), "Installed value differs");
+            }
         }
     }
 }

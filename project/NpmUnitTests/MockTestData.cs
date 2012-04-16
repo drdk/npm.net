@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="MockTestData.cs" company="">
-// TODO: Update copyright text.
+// <copyright file="MockTestData.cs" company="Microsoft">
+// Class for npm package manager unit tests
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -13,31 +13,58 @@ namespace NpmUnitTests
     using NodejsNpm;
 
     /// <summary>
-    /// TODO: Update summary.
+    /// Data used as input or as expected result for unit tests
     /// </summary>
     internal static class MockTestData
     {
         /// <summary>
         /// Npm text output for install
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Predictable output text for install test</returns>
         public static string Install1Text()
         {
-            return "underscore@1.3.1 ./node_modules/underscore\n";
+            return
+                "{\n" +
+                "  \"./node_modules/underscore\": {\n" +
+                "    \"parent\": null,\n" +
+                "    \"children\": [],\n" +
+                "    \"where\": \"./node_modules/underscore\",\n" +
+                "    \"what\": \"underscore@1.3.3\",\n" +
+                "    \"from\": \"underscore\"\n" +
+                "  }\n" +
+                "}\n";
         }
 
         /// <summary>
         /// Expected output from install
         /// </summary>
-        /// <returns></returns>
-        public static List<NpmPackage> Install1Expected()
+        /// <returns>Expected result for install test</returns>
+        public static List<NpmInstalledPackage> Install1Expected()
         {
-            List<NpmPackage> expected = new List<NpmPackage>();
-            NpmPackage package = new NpmPackage("underscore", "1.3.1");
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            NpmInstalledPackage package = new NpmInstalledPackage();
+            package.Name = "underscore";
+            package.Version = "1.3.3";
+            package.DependentPath = string.Empty;
             expected.Add(package);
             return expected;
         }
 
+        /// <summary>
+        /// Expected output from install
+        /// </summary>
+        /// <returns>Expected result for install test - high level</returns>
+        public static List<string> Install1ExpectedNames()
+        {
+            List<string> expected = new List<string>();
+            expected.Add("underscore");
+            return expected;
+        }
+
+        /// <summary>
+        /// Expected input for list
+        /// </summary>
+        /// <returns>Predictable output text for list test</returns>
         public static string List1Text()
         {
             return
@@ -63,36 +90,103 @@ namespace NpmUnitTests
                     "}";
         }
 
-        public static NpmInstalledPackage List1Expected()
+        /// <summary>
+        /// Expected output from list
+        /// </summary>
+        /// <returns>Expected result for list test</returns>
+        public static List<NpmInstalledPackage> List1Expected()
         {
-            NpmInstalledPackage expected = new NpmInstalledPackage();
-            expected.Name = "azure";
-            expected.Version = "0.5.2";
-            List<INpmInstalledPackage> depends = new List<INpmInstalledPackage>();
-            expected.MissingDependencies = null;
-            expected.OutdatedDependencies = null;
-            NpmInstalledPackage depend = new NpmInstalledPackage();
-            depend.Name = "xml2js";
-            depend.Version = "0.1.13";
-            depends.Add(depend);
-            depend = new NpmInstalledPackage();
-            depend.Name = "sax";
-            depend.Version = "0.4.0";
-            depends.Add(depend);
-            depend = new NpmInstalledPackage();
-            depend.Name = "jshint";
-            depend.Version = "0.5.9";
-            depends.Add(depend);
-            List<INpmInstalledPackage> jshintDepends = new List<INpmInstalledPackage>();
-            NpmInstalledPackage jshintDepend = new NpmInstalledPackage();
-            jshintDepend.Name = "argsparser";
-            jshintDepend.Version = "0.0.6";
-            jshintDepends.Add(jshintDepend);
-            jshintDepend.InstalledDependencies = jshintDepends;
-            expected.InstalledDependencies = depends;
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            NpmInstalledPackage package;
+            package = new NpmInstalledPackage();
+            package.Name = "azure";
+            package.Version = "0.5.2";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = string.Empty;
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "xml2js";
+            package.Version = "0.1.13";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "sax";
+            package.Version = "0.4.0";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "jshint";
+            package.Version = "0.5.9";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "argsparser";
+            package.Version = "0.0.6";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = "azure/jshint";
+            expected.Add(package);
             return expected;
         }
 
+        /// <summary>
+        /// Input for IsInstalled test
+        /// </summary>
+        /// <returns>Input data for IsInstalled test</returns>
+        public static NpmPackage List1MatchInstalledPackage()
+        {
+            NpmPackage package;
+            package = new NpmPackage("xml2js", null);
+            return package;
+        }
+
+        /// <summary>
+        /// Expected result for IsInstalled
+        /// </summary>
+        /// <returns>Expected result for IsInstalled test</returns>
+        public static NpmInstalledPackage List1MatchInstalledExpected()
+        {
+            NpmInstalledPackage package;
+            package = new NpmInstalledPackage();
+            package.Name = "xml2js";
+            package.Version = "0.1.13";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = "azure";
+            return package;
+        }
+
+        /// <summary>
+        /// Input for IsInstalled
+        /// </summary>
+        /// <returns>Input for IsInstalled test</returns>
+        public static NpmPackage List2MatchInstalledPackage()
+        {
+            NpmPackage package;
+            package = new NpmPackage("bogus", null);
+            return package;
+        }
+
+        /// <summary>
+        /// Expected result for IsInstalled
+        /// </summary>
+        /// <returns>Expected result for IsInstalled test</returns>
+        public static NpmInstalledPackage List2MatchInstalledExpected()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Expected input for list with issues
+        /// </summary>
+        /// <returns>Predictable output text for list test</returns>
         public static string ListProblems1Text()
         {
             return
@@ -118,42 +212,57 @@ namespace NpmUnitTests
                     "}";
         }
 
-        public static NpmInstalledPackage ListProblem1Expected()
+        /// <summary>
+        /// Expected output from list
+        /// </summary>
+        /// <returns>Expected result for list test</returns>
+        public static List<NpmInstalledPackage> ListProblem1Expected()
         {
-            NpmInstalledPackage expected = new NpmInstalledPackage();
-            expected.Name = "azure";
-            expected.Version = "0.5.2";
-            List<INpmInstalledPackage> depends = new List<INpmInstalledPackage>();
-            expected.MissingDependencies = null;
-            expected.OutdatedDependencies = null;
-            NpmInstalledPackage depend = new NpmInstalledPackage();
-            depend.Name = "xml2js";
-            depend.Version = "0.1.13";
-            depends.Add(depend);
-            depend = new NpmInstalledPackage();
-            expected.InstalledDependencies = depends;
-
-            List<NpmPackageDependency> badDepends = new List<NpmPackageDependency>();
-            NpmPackageDependency badDepend = new NpmPackageDependency();
-            badDepend.Name = "mime";
-            badDepend.VersionRange = ">= 1.2.4";
-            badDepends.Add(badDepend);
-            expected.MissingDependencies = badDepends;
-
-            badDepends = new List<NpmPackageDependency>();
-            badDepend = new NpmPackageDependency();
-            badDepend.Name = "underscore";
-            badDepend.Version = "1.3.0";
-            badDepends.Add(badDepend);
-            expected.OutdatedDependencies = badDepends;
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            NpmInstalledPackage package;
+            package = new NpmInstalledPackage();
+            package.Name = "azure";
+            package.Version = "0.5.2";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = string.Empty;
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "xml2js";
+            package.Version = "0.1.13";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "mime";
+            package.IsMissing = true;
+            package.IsOutdated = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "underscore";
+            package.Version = "1.3.0";
+            package.IsMissing = false;
+            package.IsOutdated = true;
+            package.DependentPath = "azure";
+            expected.Add(package);
             return expected;
         }
 
+        /// <summary>
+        /// Expected input for outdated
+        /// </summary>
+        /// <returns>Predictable output text for outdated test</returns>
         public static string Outdated1Text()
         {
             return "underscore@1.3.1 ./node_modules/underscore current=1.3.0\n";
         }
 
+        /// <summary>
+        /// Expected output from outdated with name
+        /// </summary>
+        /// <returns>Expected result for outdated test</returns>
         public static NpmPackageDependency OutdatedSingle1Expected()
         {
             NpmPackageDependency dependency = new NpmPackageDependency();
@@ -163,6 +272,10 @@ namespace NpmUnitTests
             return dependency;
         }
 
+        /// <summary>
+        /// Expected output from outdated
+        /// </summary>
+        /// <returns>Expected result for outdated test</returns>
         public static List<NpmPackageDependency> Outdated1Expected()
         {
             List<NpmPackageDependency> expected = new List<NpmPackageDependency>();
@@ -174,6 +287,10 @@ namespace NpmUnitTests
             return expected;
         }
 
+        /// <summary>
+        /// Expected input for search
+        /// </summary>
+        /// <returns>Predictable output text for search test</returns>
         public static string SearchResult1Text()
         {
             return
@@ -183,22 +300,29 @@ namespace NpmUnitTests
                 "node_in_windows_azure An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012 =tomgallacher 2012-01-25 15:19\n";
         }
 
+        /// <summary>
+        /// Expected output from search
+        /// </summary>
+        /// <returns>Expected result for search test</returns>
         public static List<NpmSearchResultPackage> SearchResult1Expected()
         {
             List<NpmSearchResultPackage> expected = new List<NpmSearchResultPackage>();
-            NpmSearchResultPackage res = new NpmSearchResultPackage("azure",
+            NpmSearchResultPackage res = new NpmSearchResultPackage(
+                "azure",
                 null,
                 "Windows Azure Client Library for node",
                 "andrerod",
                 new DateTime(2012, 2, 16, 5, 16, 0),
                 new string[] { "node", "azure" });
-            NpmSearchResultPackage res2 = new NpmSearchResultPackage("node-swt",
+            NpmSearchResultPackage res2 = new NpmSearchResultPackage(
+                "node-swt",
                 null,
                 "A library to validate and parse swt tokens",
                 "dario.renzulli",
                 new DateTime(2012, 1, 18, 1, 7, 0),
                 new string[] { "swt", "acs", "security", "azure" });
-            NpmSearchResultPackage res3 = new NpmSearchResultPackage("node_in_windows_azure",
+            NpmSearchResultPackage res3 = new NpmSearchResultPackage(
+                "node_in_windows_azure",
                 null,
                 "An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012",
                 "tomgallacher",
@@ -210,6 +334,66 @@ namespace NpmUnitTests
             return expected;
         }
 
+        /// <summary>
+        /// Expected input for search
+        /// </summary>
+        /// <returns>Predictable output text for search test</returns>
+        public static string SearchResult2Text()
+        {
+            return
+                "NAME                  DESCRIPTION                                                   AUTHOR            DATE              KEYWORDS\n" +
+                "azure                 Windows Azure Client Library for node                         =andrerod         2012-02-16 05:16  node azure\n" +
+                "node-swt              A library to validate and parse swt tokens                    =dario.renzulli   2012-01-18 01:07  swt acs security azure\n" +
+                "node_in_windows_azure An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012 =tomgallacher 2012-01-25 15:19\n" +
+                "video             A C++ module for node.js that creates Theora/Ogg videos from RGB frames. =pkrumins 2012-04-01 17:09  video videos theora rgb\n";
+        }
+
+        /// <summary>
+        /// Expected output from search
+        /// </summary>
+        /// <returns>Expected result for search test</returns>
+        public static List<NpmSearchResultPackage> SearchResult2Expected()
+        {
+            List<NpmSearchResultPackage> expected = new List<NpmSearchResultPackage>();
+            NpmSearchResultPackage res = new NpmSearchResultPackage(
+                "azure",
+                null,
+                "Windows Azure Client Library for node",
+                "andrerod",
+                new DateTime(2012, 2, 16, 5, 16, 0),
+                new string[] { "node", "azure" });
+            NpmSearchResultPackage res2 = new NpmSearchResultPackage(
+                "node-swt",
+                null,
+                "A library to validate and parse swt tokens",
+                "dario.renzulli",
+                new DateTime(2012, 1, 18, 1, 7, 0),
+                new string[] { "swt", "acs", "security", "azure" });
+            NpmSearchResultPackage res3 = new NpmSearchResultPackage(
+                "node_in_windows_azure",
+                null,
+                "An NPM module for the Windows Azure t-shirts handed out at #NodeSummit 2012",
+                "tomgallacher",
+                new DateTime(2012, 1, 25, 15, 19, 0),
+                new string[] { });
+            NpmSearchResultPackage res4 = new NpmSearchResultPackage(
+                "video",
+                null,
+                "A C++ module for node.js that creates Theora/Ogg videos from RGB frames.",
+                "pkrumins",
+                new DateTime(2012, 4, 1, 17, 9, 0),
+                new string[] { "video", "videos", "theora", "rgb" });
+            expected.Add(res);
+            expected.Add(res2);
+            expected.Add(res3);
+            expected.Add(res4);
+            return expected;
+        }
+
+        /// <summary>
+        /// Expected input for view
+        /// </summary>
+        /// <returns>Predictable output text for view test</returns>
         public static string View1Text()
         {
             return
@@ -245,6 +429,10 @@ namespace NpmUnitTests
                     "  optionalDependencies: {} }";
         }
 
+        /// <summary>
+        /// Expected output from view
+        /// </summary>
+        /// <returns>Expected result for view test</returns>
         public static NpmRemotePackage View1Expected()
         {
             NpmRemotePackage expected = new NpmRemotePackage();
@@ -261,7 +449,7 @@ namespace NpmUnitTests
             maintainers.Add("felixge <felix@debuggable.com>");
             expected.Maintainers = maintainers;
             expected.Contributors = null;
-            expected.HomepageUrl = "https://github.com/felixge/node-dateformat";
+            expected.Homepage = "https://github.com/felixge/node-dateformat";
             expected.Author = "Steven Levithan";
             expected.Dependencies = new List<NpmPackageDependency>();
             expected.DevDependencies = new List<NpmPackageDependency>();
@@ -271,15 +459,147 @@ namespace NpmUnitTests
             return expected;
         }
 
+        /// <summary>
+        /// Expected input for version
+        /// </summary>
+        /// <returns>Predictable output text for version test</returns>
         public static string Version1Text()
         {
             return "1.1.9\n\n";
         }
 
+        /// <summary>
+        /// Expected output from version
+        /// </summary>
+        /// <returns>Expected result for version test</returns>
         public static string Version1Expected()
         {
             return "1.1.9";
         }
 
+        /// <summary>
+        /// Expected input for list
+        /// </summary>
+        /// <returns>Predictable output text for list test</returns>
+        public static string ListBeforeUninstallText()
+        {
+            return
+                    "{\n" +
+                    "  \"dependencies\": {\n" +
+                    "    \"xml2js\": {\n" +
+                    "      \"version\": \"0.1.13\"\n" +
+                    "    },\n" +
+                    "    \"uninstall1\": {\n" +
+                    "      \"version\": \"0.4.0\"\n" +
+                    "    },\n" +
+                    "    \"jshint\": {\n" +
+                    "      \"version\": \"0.5.9\",\n" +
+                    "      \"dependencies\": {\n" +
+                    "        \"argsparser\": {\n" +
+                    "          \"version\": \"0.0.6\"\n" +
+                    "        }\n" +
+                    "      }\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+        }
+
+        /// <summary>
+        /// Expected input for list
+        /// </summary>
+        /// <returns>Predictable output text for list test</returns>
+        public static string ListAfterUninstallText()
+        {
+            return
+                    "{\n" +
+                    "  \"dependencies\": {\n" +
+                    "    \"xml2js\": {\n" +
+                    "      \"version\": \"0.1.13\"\n" +
+                    "    },\n" +
+                    "    \"jshint\": {\n" +
+                    "      \"version\": \"0.5.9\",\n" +
+                    "      \"dependencies\": {\n" +
+                    "        \"argsparser\": {\n" +
+                    "          \"version\": \"0.0.6\"\n" +
+                    "        }\n" +
+                    "      }\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+        }
+
+        /// <summary>
+        /// Expected output from uninstall
+        /// </summary>
+        /// <returns>Expected result for uninstall test</returns>
+        public static List<string> Uninstall1Expected()
+        {
+            List<string> uninstallList = new List<string>();
+            uninstallList.Add("uninstall1");
+            return uninstallList;
+        }
+
+        /// <summary>
+        /// Expected input for outdated module with outdated dependecy
+        /// </summary>
+        /// <returns>Predictable output text for outdated test</returns>
+        public static string ListOutdatedMultiText()
+        {
+            return
+                    "{\n" +
+                    "  \"name\": \"outdatedparent\",\n" +
+                    "  \"version\": \"0.5.2\",\n" +
+                    "  \"dependencies\": {\n" +
+                    "    \"current\": {\n" +
+                    "      \"version\": \"0.1.13\"\n" +
+                    "    },\n" +
+                    "    \"outdatedchild\": {\n" +
+                    "      \"version\": \"1.3.0\",\n" +
+                    "      \"invalid\": true,\n" +
+                    "      \"problems\": [\n" +
+                    "        \"invalid: outdatedchild@1.3.0 C:\\\\mock\\\\mockdata\\\\node_modules\\\\outdatedchild\"\n" +
+                    "      ]\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+        }
+
+        /// <summary>
+        /// Expected input for outdated
+        /// </summary>
+        /// <returns>Predictable output text for outdated test</returns>
+        public static string OutdatedParentText()
+        {
+            return "outdatedparent@0.5.4 ./node_modules/outdatedparent current=0.5.2\n";
+        }
+
+        /// <summary>
+        /// Expected input for outdated
+        /// </summary>
+        /// <returns>Predictable output text for outdated test</returns>
+        public static string OutdatedChildText()
+        {
+            return "outdatedchild@1.3.1 ./node_modules/outdatedparent//node_modules/outdatedchild current=1.3.0\n";
+        }
+
+        /// <summary>
+        /// Expected output from outdated
+        /// </summary>
+        /// <returns>Expected result for outdated test</returns>
+        public static List<NpmPackageDependency> OutdatedMultiExpected()
+        {
+            List<NpmPackageDependency> expected = new List<NpmPackageDependency>();
+            NpmPackageDependency dependency = new NpmPackageDependency();
+            dependency.Name = "outdatedparent";
+            dependency.Version = "0.5.2";
+            dependency.VersionRange = "0.5.4";
+            expected.Add(dependency);
+            dependency = new NpmPackageDependency();
+            dependency.Name = "outdatedchild";
+            dependency.Version = "1.3.0";
+            dependency.VersionRange = "1.3.1";
+            expected.Add(dependency);
+            return expected;
+        }
     }
 }
