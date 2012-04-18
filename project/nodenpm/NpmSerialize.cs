@@ -4,13 +4,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.IO;
-    using System.Security;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web.Script.Serialization;
@@ -18,7 +17,6 @@ namespace NodejsNpm
     /// <summary>
     /// class for serialization from npm to objects
     /// </summary>
-    [SecurityCritical]
     public class NpmSerialize : INpmSerialize
     {
         /// <summary>
@@ -95,7 +93,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="listJson">text output</param>
         /// <returns>enumerable NpmInstalledPackage properties</returns>
-        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> FromListInstalled(string listJson)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -134,7 +131,6 @@ namespace NodejsNpm
         /// <param name="listJson">text output</param>
         /// <param name="package">Installed package with name to match</param>
         /// <returns>NpmInstalledPackage properties or null</returns>
-        [SecurityCritical]
         public INpmInstalledPackage FromListMatchInstalled(string listJson, INpmPackage package)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -172,7 +168,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="viewJson">text output</param>
         /// <returns>INpmRemotePackage with property values</returns>
-        [SecurityCritical]
         public INpmRemotePackage FromView(string viewJson)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -214,7 +209,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="outdated">text output</param>
         /// <returns>enumerable INpmPackageDependency properties</returns>
-        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> FromOutdatedDependency(string outdated)
         {
             if (outdated == null)
@@ -265,7 +259,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="output">text output</param>
         /// <returns>enumerable INpmSearchResultPackage properties</returns>
-        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> FromSearchResult(string output)
         {
             List<INpmSearchResultPackage> results = new List<INpmSearchResultPackage>();
@@ -338,7 +331,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="output">text output</param>
         /// <returns>enumerable INpmInstalledPackage properties</returns>
-        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> FromInstall(string output)
         {
             JavaScriptSerializer serializer = new JavaScriptSerializer();
@@ -376,7 +368,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">INpmPackage to update</param>
         /// <param name="nameVersion">string name or name@version</param>
-        [SecurityCritical]
         private static void FillPackageFromNameVersion(INpmPackage package, string nameVersion)
         {
             if (nameVersion == null)
@@ -407,7 +398,6 @@ namespace NodejsNpm
         /// <param name="name">name of package</param>
         /// <param name="viewObj">dictionary at root of object</param>
         /// <returns>NpmRemotePackage instance</returns>
-        [SecurityCritical]
         private static NpmRemotePackage RemotePackageFromDictionary(string name, Dictionary<string, object> viewObj)
         {
             NpmRemotePackage remote = new NpmRemotePackage();
@@ -496,7 +486,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="obj">object to convert</param>
         /// <returns>A List of strings</returns>
-        [SecurityCritical]
         private static List<string> ConvertStringArray(object obj)
         {
             List<string> strings = null;
@@ -530,7 +519,6 @@ namespace NodejsNpm
         /// <param name="key">The string key of the dependency</param>
         /// <param name="value">The object value</param>
         /// <returns>A package dependency</returns>
-        [SecurityCritical]
         private static NpmPackageDependency ConvertKeyValueToDependency(string key, object value)
         {
             NpmPackageDependency dependency = new NpmPackageDependency();
@@ -544,7 +532,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="obj">The parsed json object to convert</param>
         /// <returns>A List of package dependencies</returns>
-        [SecurityCritical]
         private static List<NpmPackageDependency> ConvertDependencies(object obj)
         {
             Dictionary<string, object> deps = obj as Dictionary<string, object>;
@@ -568,7 +555,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="obj">The object to convert</param>
         /// <returns>A reference with type and url</returns>
-        [SecurityCritical]
         private static NpmReference ConvertReference(object obj)
         {
             Dictionary<string, object> dictionary = obj as Dictionary<string, object>;
@@ -596,7 +582,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="parent">Parent list for this object</param>
         /// <param name="child">Child object is dictionary from json deserialize</param>
-        [SecurityCritical]
         private static void InstalledPackagesFromInstalledDictionary(
                                             List<INpmInstalledPackage> parent,
                                             object child)
@@ -654,7 +639,6 @@ namespace NodejsNpm
         /// <param name="dependentPath">list of parents delimited by "/"</param>
         /// <param name="listObj">dictionary at root of package</param>
         /// <remarks>This is called recursively as a dependency is a package</remarks>
-        [SecurityCritical]
         private void InstalledPackageFromDictionary(
                                                     List<INpmInstalledPackage> parent,
                                                     string name,
@@ -721,7 +705,6 @@ namespace NodejsNpm
         /// <param name="listObj">dictionary at root of package</param>
         /// <returns>Installed package object</returns>
         /// <remarks>This is called recursively as a dependency is a package</remarks>
-        [SecurityCritical]
         private NpmInstalledPackage MatchPackageFromDictionary(
                                                     INpmPackage package,
                                                     string name,

@@ -10,7 +10,7 @@ namespace NpmUnitTests
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using NodejsNpm;
+    using NodeNpm;
 
     /// <summary>
     /// Data used as input or as expected result for unit tests
@@ -103,6 +103,7 @@ namespace NpmUnitTests
             package.Version = "0.5.2";
             package.IsMissing = false;
             package.IsOutdated = false;
+            package.HasDependencies = true;
             package.DependentPath = string.Empty;
             expected.Add(package);
             package = new NpmInstalledPackage();
@@ -110,6 +111,7 @@ namespace NpmUnitTests
             package.Version = "0.1.13";
             package.IsMissing = false;
             package.IsOutdated = false;
+            package.HasDependencies = false;
             package.DependentPath = "azure";
             expected.Add(package);
             package = new NpmInstalledPackage();
@@ -117,6 +119,7 @@ namespace NpmUnitTests
             package.Version = "0.4.0";
             package.IsMissing = false;
             package.IsOutdated = false;
+            package.HasDependencies = false;
             package.DependentPath = "azure";
             expected.Add(package);
             package = new NpmInstalledPackage();
@@ -124,6 +127,7 @@ namespace NpmUnitTests
             package.Version = "0.5.9";
             package.IsMissing = false;
             package.IsOutdated = false;
+            package.HasDependencies = true;
             package.DependentPath = "azure";
             expected.Add(package);
             package = new NpmInstalledPackage();
@@ -131,6 +135,7 @@ namespace NpmUnitTests
             package.Version = "0.0.6";
             package.IsMissing = false;
             package.IsOutdated = false;
+            package.HasDependencies = false;
             package.DependentPath = "azure/jshint";
             expected.Add(package);
             return expected;
@@ -226,6 +231,7 @@ namespace NpmUnitTests
             package.IsMissing = false;
             package.IsOutdated = false;
             package.DependentPath = string.Empty;
+            package.HasDependencies = true;
             expected.Add(package);
             package = new NpmInstalledPackage();
             package.Name = "xml2js";
@@ -233,12 +239,14 @@ namespace NpmUnitTests
             package.IsMissing = false;
             package.IsOutdated = false;
             package.DependentPath = "azure";
+            package.HasDependencies = false;
             expected.Add(package);
             package = new NpmInstalledPackage();
             package.Name = "mime";
             package.IsMissing = true;
             package.IsOutdated = false;
             package.DependentPath = "azure";
+            package.HasDependencies = false;
             expected.Add(package);
             package = new NpmInstalledPackage();
             package.Name = "underscore";
@@ -246,6 +254,7 @@ namespace NpmUnitTests
             package.IsMissing = false;
             package.IsOutdated = true;
             package.DependentPath = "azure";
+            package.HasDependencies = false;
             expected.Add(package);
             return expected;
         }

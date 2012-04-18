@@ -1,10 +1,12 @@
-project/nodejsnpm/StyleCop.Cache
+project/nodenpm/StyleCop.Cache
 *.exe
 *.obj
 *.suo
+project/NpmApiSample/bin/
+project/NpmApiSample/obj/
 project/NpmUnitTests/bin/
 project/NpmUnitTests/obj/
-project/nodejsnpm/bin/
-project/nodejsnpm/obj/
+project/nodenpm/bin/
+project/nodenpm/obj/
 project/TestResults/
 testimpactdata.sdf

@@ -4,18 +4,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security;
     using System.Text;
 
     /// <summary>
     /// NpmReference has type and a reference url
     /// </summary>
-    public class NpmReference : INpmReference
+    public class NpmReference : INpmReference, IEquatable<INpmReference>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmReference" /> class.
@@ -33,9 +32,7 @@ namespace NodejsNpm
         /// </summary>
         public string Type
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -44,18 +41,16 @@ namespace NodejsNpm
         /// </summary>
         public string Reference
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmReference to compare</param>
+        /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmReference package)
+        public bool Equals(INpmReference package)
         {
             if (package == null)
             {
@@ -73,6 +68,36 @@ namespace NodejsNpm
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Test if another object matches this one
+        /// </summary>
+        /// <param name="package">object to compare</param>
+        /// <returns>true if match, false if not matched</returns>
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as INpmReference);
+        }
+
+        /// <summary>
+        /// Calculate hash code
+        /// </summary>
+        /// <returns>hash value for object</returns>
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            if (this.Type != null)
+            {
+                hash = hash ^ this.Type.GetHashCode();
+            }
+
+            if (this.Reference != null)
+            {
+                hash = hash ^ this.Reference.GetHashCode();
+            }
+
+            return hash;
         }
     }
 }

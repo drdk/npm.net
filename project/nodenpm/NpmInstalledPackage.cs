@@ -4,18 +4,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security;
     using System.Text;
 
     /// <summary>
     /// NpmPackage plus dependencies
     /// </summary>
-    public class NpmInstalledPackage : INpmInstalledPackage
+    public class NpmInstalledPackage : INpmInstalledPackage, IEquatable<INpmInstalledPackage>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmInstalledPackage" /> class.
@@ -29,9 +28,7 @@ namespace NodejsNpm
         /// </summary>
         public string Name
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -40,9 +37,7 @@ namespace NodejsNpm
         /// </summary>
         public string Version
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -51,9 +46,7 @@ namespace NodejsNpm
         /// </summary>
         public string DependentPath
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -62,9 +55,7 @@ namespace NodejsNpm
         /// </summary>
         public bool IsMissing
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -73,9 +64,7 @@ namespace NodejsNpm
         /// </summary>
         public bool IsOutdated
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -84,18 +73,16 @@ namespace NodejsNpm
         /// </summary>
         public bool HasDependencies
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmInstalledPackeag to compare</param>
+        /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmInstalledPackage package)
+        public bool Equals(INpmInstalledPackage package)
         {
             if (package == null)
             {
@@ -117,7 +104,57 @@ namespace NodejsNpm
                 return false;
             }
 
+            if (this.IsMissing != package.IsMissing)
+            {
+                return false;
+            }
+
+            if (this.IsOutdated != package.IsOutdated)
+            {
+                return false;
+            }
+
+            if (this.HasDependencies != package.HasDependencies)
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// Test if another object matches this one
+        /// </summary>
+        /// <param name="package">object to compare</param>
+        /// <returns>true if match, false if not matched</returns>
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as INpmInstalledPackage);
+        }
+
+        /// <summary>
+        /// Calculate hash code
+        /// </summary>
+        /// <returns>hash value for object</returns>
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            if (this.Name != null)
+            {
+                hash = hash ^ this.Name.GetHashCode();
+            }
+
+            if (this.Version != null)
+            {
+                hash = hash ^ this.Version.GetHashCode();
+            }
+
+            if (this.DependentPath != null)
+            {
+                hash = hash ^ this.DependentPath.GetHashCode();
+            }
+
+            return hash;
         }
     }
 }

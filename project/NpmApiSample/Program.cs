@@ -11,7 +11,7 @@ namespace NpmApiSample
     using System.IO;
     using System.Linq;
     using System.Text;
-    using NodejsNpm;
+    using NodeNpm;
 
     /// <summary>
     /// Main entry for NpmApiSample program
@@ -24,14 +24,20 @@ namespace NpmApiSample
         private const string SearchTerm = "azure";
 
         /// <summary>
+        /// Default node install path
+        /// </summary>
+        private const string DefInstallPath = @"%ProgramFiles%\nodejs\";
+
+        /// <summary>
         /// Main entry point
         /// </summary>
         /// <param name="args">Command line arguments</param>
         public static void Main(string[] args)
         {
             string wd = Environment.CurrentDirectory;
-            ApiSample.RunSample(wd, SearchTerm);
-            PackageManagerSample.RunSample(wd, SearchTerm);
+            string installPath = Environment.ExpandEnvironmentVariables(DefInstallPath);
+            ApiSample.RunSample(wd, installPath, SearchTerm);
+            PackageManagerSample.RunSample(wd, installPath, SearchTerm);
         }
     }
 }

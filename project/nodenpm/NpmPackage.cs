@@ -4,18 +4,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security;
     using System.Text;
 
     /// <summary>
     /// NpmPackage has name and optional version
     /// </summary>
-    public class NpmPackage : INpmPackage
+    public class NpmPackage : INpmPackage , IEquatable<INpmPackage>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmPackage" /> class.
@@ -33,9 +32,7 @@ namespace NodejsNpm
         /// </summary>
         public string Name
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -44,9 +41,7 @@ namespace NodejsNpm
         /// </summary>
         public string Version
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -55,7 +50,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmPackage package)
+        public bool Equals(INpmPackage package)
         {
             if (package == null)
             {
@@ -76,6 +71,36 @@ namespace NodejsNpm
         }
 
         /// <summary>
+        /// Test if another object matches this one
+        /// </summary>
+        /// <param name="package">object to compare</param>
+        /// <returns>true if match, false if not matched</returns>
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as INpmPackage);
+        }
+
+        /// <summary>
+        /// Calculate hash code
+        /// </summary>
+        /// <returns>hash value for object</returns>
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            if (this.Name != null)
+            {
+                hash = hash ^ this.Name.GetHashCode();
+            }
+
+            if (this.Version != null)
+            {
+                hash = hash ^ this.Version.GetHashCode();
+            }
+
+            return hash;
+        }
+
+        /// <summary>
         /// Compare two string enumerations for equality 
         /// </summary>
         /// <param name="first">string enumeration</param>
@@ -87,8 +112,8 @@ namespace NodejsNpm
         {
             if (first != null && second != null)
             {
-                if (first.Count<string>() !=
-                    second.Count<string>())
+                if (first.Count() !=
+                    second.Count())
                 {
                     return false;
                 }

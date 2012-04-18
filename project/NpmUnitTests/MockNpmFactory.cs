@@ -10,7 +10,7 @@ namespace NpmUnitTests
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using NodejsNpm;
+    using NodeNpm;
 
     /// <summary>
     /// The class that acts as a class factory and returns a mock client for testing

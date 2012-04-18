@@ -4,21 +4,19 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
-    using System.Security;
     using System.Text;
     using System.Timers;
 
     /// <summary>
     /// The class that invokes NPM commands and returns the results text
     /// </summary>
-    [SecurityCritical]
     public class NpmClient : INpmClient
     {
         /// <summary>
@@ -74,7 +72,6 @@ namespace NodejsNpm
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmClient" /> class.
         /// </summary>
-        [SecurityCritical]
         public NpmClient()
         {
             this.WorkingDirectory = Environment.CurrentDirectory;
@@ -88,7 +85,6 @@ namespace NodejsNpm
         /// Accepts the current project directory.
         /// </summary>
         /// <param name="wd">project directory</param>
-        [SecurityCritical]
         public NpmClient(string wd)
         {
             this.WorkingDirectory = wd;
@@ -102,9 +98,7 @@ namespace NodejsNpm
         /// </summary>
         public string InstallPath 
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -113,9 +107,7 @@ namespace NodejsNpm
         /// </summary>
         public string NpmRelativePath
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -124,9 +116,7 @@ namespace NodejsNpm
         /// </summary>
         public string WorkingDirectory
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -135,9 +125,7 @@ namespace NodejsNpm
         /// </summary>
         public string Registry
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -146,9 +134,7 @@ namespace NodejsNpm
         /// </summary>
         public string HttpProxy
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -157,9 +143,7 @@ namespace NodejsNpm
         /// </summary>
         public string HttpsProxy
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -168,9 +152,7 @@ namespace NodejsNpm
         /// </summary>
         public int Timeout
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -179,7 +161,6 @@ namespace NodejsNpm
         /// </summary>
         public string LastExecuteOutput
         {
-            [SecurityCritical]
             get
             {
                 return this.lastExecuteOutput;
@@ -191,7 +172,6 @@ namespace NodejsNpm
         /// </summary>
         public string LastExecuteErrorText
         {
-            [SecurityCritical]
             get
             {
                 return this.lastExecuteErrorText;
@@ -205,7 +185,6 @@ namespace NodejsNpm
         /// <param name="args">remainder of npm command line</param>
         /// <returns>exit code. 0 is success</returns>
         /// <remarks>LastExecuteOutput and LastExecuteError will be set</remarks>
-        [SecurityCritical]
         public int Execute(string cmd, string args)
         {
             if (string.IsNullOrWhiteSpace(cmd))
@@ -311,7 +290,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="sendingProcess">The sender</param>
         /// <param name="outLine">The event</param>
-        [SecurityCritical]
         private static void ErrorOutputHandler(
                                                 object sendingProcess, 
                                                 DataReceivedEventArgs outLine)
@@ -332,7 +310,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="sendingProcess">The sender</param>
         /// <param name="outLine">The event</param>
-        [SecurityCritical]
         private static void StandardOutputHandler(
                                                 object sendingProcess,
                                                 DataReceivedEventArgs outLine)

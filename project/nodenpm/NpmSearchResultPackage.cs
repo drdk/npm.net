@@ -4,17 +4,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
-    using System.Security;
     using System.Text;
 
     /// <summary>
     /// NpmPackage plus properties from search result
     /// </summary>
-    public class NpmSearchResultPackage : INpmSearchResultPackage
+    public class NpmSearchResultPackage : INpmSearchResultPackage, IEquatable<INpmSearchResultPackage>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmSearchResultPackage" /> class.
@@ -46,9 +45,7 @@ namespace NodejsNpm
         /// </summary>
         public string Name
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -57,9 +54,7 @@ namespace NodejsNpm
         /// </summary>
         public string Version
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -68,9 +63,7 @@ namespace NodejsNpm
         /// </summary>
         public string Description
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -79,9 +72,7 @@ namespace NodejsNpm
         /// </summary>
         public string Author
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -90,9 +81,7 @@ namespace NodejsNpm
         /// </summary>
         public IEnumerable<string> Keywords
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -101,18 +90,16 @@ namespace NodejsNpm
         /// </summary>
         public DateTime LatestDate
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmSearchResultPackage to compare</param>
+        /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmSearchResultPackage package)
+        public bool Equals(INpmSearchResultPackage package)
         {
             if (package == null)
             {
@@ -140,6 +127,41 @@ namespace NodejsNpm
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Test if another object matches this one
+        /// </summary>
+        /// <param name="package">object to compare</param>
+        /// <returns>true if match, false if not matched</returns>
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as INpmSearchResultPackage);
+        }
+
+        /// <summary>
+        /// Calculate hash code
+        /// </summary>
+        /// <returns>hash value for object</returns>
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            if (this.Name != null)
+            {
+                hash = hash ^ this.Name.GetHashCode();
+            }
+
+            if (this.Description != null)
+            {
+                hash = hash ^ this.Description.GetHashCode();
+            }
+
+            if (this.Author != null)
+            {
+                hash = hash ^ this.Author.GetHashCode();
+            }
+
+            return hash;
         }
     }
 }

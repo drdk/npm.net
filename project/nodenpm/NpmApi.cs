@@ -4,19 +4,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Security;
     using System.Text;
 
     /// <summary>
     /// The class implements a wrapper for NPM commands
     /// </summary>
-    [SecurityCritical]
     public class NpmApi : INpmApi
     {
         /// <summary>
@@ -28,7 +26,6 @@ namespace NodejsNpm
         /// Initializes a new instance of the <see cref="NpmApi" /> class.
         /// </summary>
         /// <param name="wd">Working directory for project</param>
-        [SecurityCritical]
         public NpmApi(string wd)
         {
             NpmFactory factory = new NpmFactory();
@@ -40,7 +37,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="wd">Working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
-        [SecurityCritical]
         public NpmApi(string wd, string registry)
         {
             NpmFactory factory = new NpmFactory();
@@ -54,7 +50,6 @@ namespace NodejsNpm
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">Working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
-        [SecurityCritical]
         public NpmApi(NpmFactory factory, string wd, string registry)
         {
             this.Initialize(factory, wd, registry);
@@ -70,7 +65,6 @@ namespace NodejsNpm
         /// </summary>
         public INpmClient NpmClient
         {
-            [SecurityCritical]
             get
             {
                 return this.Client;
@@ -91,7 +85,6 @@ namespace NodejsNpm
         /// Get npm version. Wraps 'npm --version'
         /// </summary>
         /// <returns>version string</returns>
-        [SecurityCritical]
         public string GetInstalledVersion()
         {
             int rc = this.Client.Execute("--version", null);
@@ -110,7 +103,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="dependency">Dependency path or null for root</param>
         /// <remarks>Use '/' for multiple level dependency</remarks>
-        [SecurityCritical]
         public void SetDependencyDirectory(string dependency)
         {
             if (dependency == null)
@@ -128,7 +120,6 @@ namespace NodejsNpm
         /// Change the working directory
         /// </summary>
         /// <param name="path">Full path</param>
-        [SecurityCritical]
         public void SetWorkingDirectory(string path)
         {
             this.Client.WorkingDirectory = path;
@@ -139,7 +130,6 @@ namespace NodejsNpm
         /// Get installed modules in project. Wraps 'npm list'
         /// </summary>
         /// <returns>enumerable NpmInstalledPackage properties</returns>
-        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> List()
         {
             int rc = this.Client.Execute("list", "--json");
@@ -158,7 +148,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="name">package name</param>
         /// <returns>NpmRemotePackage properties</returns>
-        [SecurityCritical]
         public INpmRemotePackage View(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -182,7 +171,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="searchTerms">words to use in search or null for all</param>
         /// <returns>enumerable set of matching packages</returns>
-        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> Search(string searchTerms)
         {
             if (searchTerms == null)
@@ -207,7 +195,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name and version to install</param>
         /// <returns>enumerable list of packages</returns>
-        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> Install(INpmPackage package)
         {
             if (package == null)
@@ -245,7 +232,6 @@ namespace NodejsNpm
         /// Get outdated or missing dependencies. Wraps 'npm outdated'
         /// </summary>
         /// <returns>enumerable set of packages needing updates</returns>
-        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> Outdated()
         {
             int rc = this.Client.Execute("outdated", null);
@@ -264,7 +250,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>enumerable set of packages needing updates</returns>
-        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> Outdated(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -288,7 +273,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>enumerable list of updated packages</returns>
-        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> Update(string name)
         {
             string args;
@@ -317,7 +301,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="name">name of package</param>
         /// <returns>true or false</returns>
-        [SecurityCritical]
         public bool Uninstall(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -340,7 +323,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name and version to install</param>
         /// <returns>NpmInstalledPackage or null</returns>
-        [SecurityCritical]
         public INpmInstalledPackage TestInstalled(INpmPackage package)
         {
             int rc = this.Client.Execute("list", "--json");
@@ -360,7 +342,6 @@ namespace NodejsNpm
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
-        [SecurityCritical]
         private void Initialize(NpmFactory factory, string wd, string registry)
         {
             // first get default client
@@ -389,7 +370,6 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="depends">dependency name</param>
         /// <returns>Absolute path based on working directory</returns>
-        [SecurityCritical]
         private string ConvertDependToPath(string depends)
         {
             string relative = NpmSerialize.ConvertDependToPath(depends);

@@ -1,13 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodejsNpm", "nodejsnpm\NodejsNpm.csproj", "{DB863DE6-F115-41CC-9384-3411100AC854}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeNpm", "nodenpm\NodeNpm.csproj", "{DB863DE6-F115-41CC-9384-3411100AC854}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{78745BC2-B454-4670-B60A-4359CD1EA034}"
 	ProjectSection(SolutionItems) = preProject
 		Local.testsettings = Local.testsettings
-		nodejsnpm.vsmdi = nodejsnpm.vsmdi
-		NodejsNpm1.vsmdi = NodejsNpm1.vsmdi
+		NodeNpm1.vsmdi = NodeNpm1.vsmdi
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
@@ -17,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpmApiSample", "NpmApiSampl
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = NodejsNpm1.vsmdi
+		CategoryFile = NodeNpm1.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

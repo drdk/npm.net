@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name and optional version to be installed</param>
         /// <returns>enumerable INpmPackage set of all installed packages</returns>
-        IEnumerable<INpmPackage> InstallPackage(INpmPackage package);
+        IEnumerable<INpmInstalledPackage> InstallPackage(INpmPackage package);
 
         /// <summary>
         /// Test if the package is installed in current project

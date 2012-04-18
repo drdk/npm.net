@@ -10,7 +10,7 @@ namespace NpmUnitTests
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NodejsNpm;
+    using NodeNpm;
 
     /// <summary>
     /// This is a test class for NpmSerializeTest and is intended
@@ -95,11 +95,11 @@ namespace NpmUnitTests
 
             actual = target.FromInstall(output);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
             foreach (NpmInstalledPackage actualItem in actual)
             {
-                Assert.IsTrue(expected[index].IsSame(actualItem), "Installed value differs");
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
                 index++;
             }
         }
@@ -118,11 +118,11 @@ namespace NpmUnitTests
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.FromListInstalled(jsonlist);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
             foreach (NpmInstalledPackage actualItem in actual)
             {
-                Assert.IsTrue(expected[index].IsSame(actualItem), "Installed value differs");
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
                 index++;
             }
         }
@@ -141,11 +141,11 @@ namespace NpmUnitTests
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.FromListInstalled(jsonlist);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmPackage>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
             foreach (NpmInstalledPackage actualItem in actual)
             {
-                Assert.IsTrue(expected[index].IsSame(actualItem), "Installed value differs");
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
                 index++;
             }
         }
@@ -171,7 +171,7 @@ namespace NpmUnitTests
             else
             {
                 Assert.IsNotNull(actual);
-                Assert.IsTrue(expected.IsSame(actual), "Installed value differs");
+                Assert.AreEqual(expected, actual, "item value differs");
             }
         }
 
@@ -196,7 +196,7 @@ namespace NpmUnitTests
             else
             {
                 Assert.IsNotNull(actual);
-                Assert.IsTrue(expected.IsSame(actual), "Installed value differs");
+                Assert.AreEqual(expected, actual, "item value differs");
             }
         }
 
@@ -214,11 +214,11 @@ namespace NpmUnitTests
             IEnumerable<INpmPackageDependency> actual;
             actual = target.FromOutdatedDependency(outdated);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmPackageDependency>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
             foreach (INpmPackageDependency actualItem in actual)
             {
-                Assert.IsTrue(expected[index].IsSame(actualItem), "ListInstalled value differs");
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
                 index++;
             }
         }
@@ -236,11 +236,11 @@ namespace NpmUnitTests
             IEnumerable<INpmSearchResultPackage> actual;
             actual = target.FromSearchResult(output);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count<INpmSearchResultPackage>());
+            Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
-            foreach (INpmSearchResultPackage result in actual)
+            foreach (INpmSearchResultPackage actualItem in actual)
             {
-                Assert.IsTrue(expected[index].IsSame(result), "Search result value differs");
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
                 index++;
             }
         }
@@ -257,7 +257,7 @@ namespace NpmUnitTests
             NpmRemotePackage expected = MockTestData.View1Expected();
             INpmRemotePackage actual;
             actual = target.FromView(jsonview);
-            Assert.IsTrue(expected.IsSame(actual), "View value differs");
+            Assert.AreEqual(expected, actual, "item value differs");
         }
     }
 }

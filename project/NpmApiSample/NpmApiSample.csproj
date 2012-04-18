@@ -50,9 +50,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\nodejsnpm\NodejsNpm.csproj">
+    <ProjectReference Include="..\nodenpm\NodeNpm.csproj">
       <Project>{DB863DE6-F115-41CC-9384-3411100AC854}</Project>
-      <Name>NodejsNpm</Name>
+      <Name>NodeNpm</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

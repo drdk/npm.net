@@ -4,19 +4,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Security;
     using System.Text;
 
     /// <summary>
     /// NpmPackage plus optional version range
     /// </summary>
-    [SecurityCritical]
-    public class NpmPackageDependency : INpmPackageDependency
+    public class NpmPackageDependency : INpmPackageDependency, IEquatable<INpmPackageDependency>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmPackageDependency" /> class.
@@ -30,9 +28,7 @@ namespace NodejsNpm
         /// </summary>
         public string Name
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -41,9 +37,7 @@ namespace NodejsNpm
         /// </summary>
         public string Version
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -52,18 +46,16 @@ namespace NodejsNpm
         /// </summary>
         public string VersionRange
         {
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmInstalledPackeag to compare</param>
+        /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool IsSame(INpmPackageDependency package)
+        public bool Equals(INpmPackageDependency package)
         {
             if (package == null)
             {
@@ -86,6 +78,41 @@ namespace NodejsNpm
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Test if another object matches this one
+        /// </summary>
+        /// <param name="package">object to compare</param>
+        /// <returns>true if match, false if not matched</returns>
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as INpmPackageDependency);
+        }
+
+        /// <summary>
+        /// Calculate hash code
+        /// </summary>
+        /// <returns>hash value for object</returns>
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            if (this.Name != null)
+            {
+                hash = hash ^ this.Name.GetHashCode();
+            }
+
+            if (this.Version != null)
+            {
+                hash = hash ^ this.Version.GetHashCode();
+            }
+
+            if (this.VersionRange != null)
+            {
+                hash = hash ^ this.VersionRange.GetHashCode();
+            }
+
+            return hash;
         }
     }
 }

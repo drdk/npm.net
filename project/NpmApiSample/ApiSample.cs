@@ -11,7 +11,7 @@ namespace NpmApiSample
     using System.IO;
     using System.Linq;
     using System.Text;
-    using NodejsNpm;
+    using NodeNpm;
 
     /// <summary>
     /// A class that uses NpmApi
@@ -24,7 +24,7 @@ namespace NpmApiSample
         /// <param name="wd">working directory path</param>
         /// <param name="module">module name to use</param>
         /// <returns>true or false</returns>
-        public static bool RunSample(string wd, string module)
+        public static bool RunSample(string wd, string installPath, string module)
         {
             string uninstalledName = null;
             NpmApi npm = new NpmApi(wd);
@@ -34,6 +34,7 @@ namespace NpmApiSample
                 return false;
             }
 
+            npm.NpmClient.InstallPath = installPath;
             INpmSearchResultPackage found = null;
             IEnumerable<INpmSearchResultPackage> searchResults = npm.Search(module);
             if (searchResults != null)
@@ -56,7 +57,7 @@ namespace NpmApiSample
 
             // install module as a dependency
             IEnumerable<INpmPackage> installed = npm.Install(found);
-            if (installed == null || installed.Count<INpmPackage>() == 0)
+            if (installed == null || installed.Count() == 0)
             {
                 Console.WriteLine("Install failed for {0}", found.Name);
                 return false;
@@ -71,7 +72,7 @@ namespace NpmApiSample
             }
 
             // there should be at least 1 item since we installed one
-            if (installedPkg.Count<INpmInstalledPackage>() == 0)
+            if (installedPkg.Count() == 0)
             {
                 Console.WriteLine("There are no packages listed");
                 return false;
@@ -103,7 +104,7 @@ namespace NpmApiSample
             // check that it is reported as missing
             bool matchMissing = false;
             IEnumerable<INpmPackageDependency> outdated = npm.Outdated();
-            if (outdated != null && outdated.Count<INpmPackageDependency>() > 0)
+            if (outdated != null && outdated.Count() > 0)
             {
                 foreach (INpmPackageDependency outofdate in outdated)
                 {
@@ -148,7 +149,7 @@ namespace NpmApiSample
             }
 
             outdated = npm.Outdated();
-            if (outdated != null && outdated.Count<INpmPackageDependency>() > 0)
+            if (outdated != null && outdated.Count() > 0)
             {
                 Console.WriteLine("Expected no outdated entry after update of {0}", module);
                 return false;

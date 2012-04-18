@@ -12,11 +12,11 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("nodejsnpm")]
+[assembly: AssemblyTitle("NodeNpm")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("nodejsnpm")]
+[assembly: AssemblyProduct("NodeNpm")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -28,8 +28,6 @@ using System.Security;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("d52fe774-5153-468c-a521-9e9728c47815")]
-
-[assembly: SecurityCritical]
 
 // Version information for an assembly consists of the following four values:
 //

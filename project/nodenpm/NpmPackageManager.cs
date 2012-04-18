@@ -4,22 +4,25 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NodejsNpm
+namespace NodeNpm
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security;
     using System.Text;
 
     /// <summary>
     /// High level class to manage NPM installation
     /// </summary>
-    public class NpmPackageManager
+    [SecurityCritical]
+    public class NpmPackageManager : INpmPackageManager
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmPackageManager" /> class.
         /// </summary>
         /// <param name="wd">current project directory</param>
+        [SecurityCritical]
         public NpmPackageManager(string wd)
         {
             this.ApiClient = new NpmApi(wd);
@@ -30,6 +33,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="wd">current project directory</param>
         /// <param name="registry">registry URL if not using default</param>
+        [SecurityCritical]
         public NpmPackageManager(string wd, string registry)
         {
             this.ApiClient = new NpmApi(wd, registry);
@@ -41,6 +45,7 @@ namespace NodejsNpm
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">current project directory</param>
         /// <param name="registry">Registry URL if not using default</param>
+        [SecurityCritical]
         public NpmPackageManager(NpmFactory factory, string wd, string registry)
         {
             this.ApiClient = new NpmApi(factory, wd, registry);
@@ -49,13 +54,32 @@ namespace NodejsNpm
         /// <summary>
         /// Gets or sets the NpmApi client to use for invoking NPM and getting results
         /// </summary>
-        public INpmApi ApiClient { get; set; }
+        public INpmApi ApiClient
+        { 
+            [SecurityCritical]
+            get;
+            [SecurityCritical]
+            set;
+        }
+
+        /// <summary>
+        /// Gets the NpmClient interface to use for invoking NPM and getting results
+        /// </summary>
+        public INpmClient NpmClient
+        {
+            [SecurityCritical]
+            get
+            {
+                return this.ApiClient.NpmClient;
+            }
+        }
 
         /// <summary>
         /// Get set of dependencies for project that are not installed or not up to date
         /// </summary>
         /// <param name="package">Package to be checked</param>
         /// <returns>enumerable INpmInstalledPackage set</returns>
+        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> FindDependenciesToBeInstalled(INpmPackage package)
         {
             if (package == null)
@@ -106,6 +130,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="packageIds">set of names</param>
         /// <returns>enumerable INpmRemotePackage set</returns>
+        [SecurityCritical]
         public IEnumerable<INpmRemotePackage> FindPackages(IEnumerable<string> packageIds)
         {
             if (packageIds == null)
@@ -133,6 +158,7 @@ namespace NodejsNpm
         /// Get installed packages within current project
         /// </summary>
         /// <returns>enumerable INpmInstalledPackage set</returns>
+        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> GetInstalledPackages()
         {
             return this.ApiClient.List();
@@ -142,6 +168,7 @@ namespace NodejsNpm
         /// Get list of available updates for installed packages
         /// </summary>
         /// <returns>enumerable INpmPackageDependency set</returns>
+        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> GetPackagesWithUpdates()
         {
             return this.ApiClient.Outdated();
@@ -151,6 +178,7 @@ namespace NodejsNpm
         /// Find all remote packages
         /// </summary>
         /// <returns>enumerable INpmSearchResultPackage set</returns>
+        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> GetRemotePackages()
         {
             return this.ApiClient.Search(null);
@@ -161,6 +189,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name and optional version to be installed</param>
         /// <returns>enumerable INpmPackage set of all installed packages</returns>
+        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> InstallPackage(INpmPackage package)
         {
             return this.ApiClient.Install(package);
@@ -171,6 +200,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name and optional version to test</param>
         /// <returns>INpmInstalledPackage or null</returns>
+        [SecurityCritical]
         public INpmInstalledPackage IsPackageInstalled(INpmPackage package)
         {
             return this.ApiClient.TestInstalled(package);
@@ -181,6 +211,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="searchTerms">set of terms</param>
         /// <returns>enumerable INpmSearchResultPackage set</returns>
+        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> SearchRemotePackages(string searchTerms)
         {
             return this.ApiClient.Search(searchTerms);
@@ -191,6 +222,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name of package</param>
         /// <returns>enumerable string set of packages removed</returns>
+        [SecurityCritical]
         public IEnumerable<string> UninstallPackage(INpmPackage package)
         {
             if (package == null)
@@ -245,6 +277,7 @@ namespace NodejsNpm
         /// </summary>
         /// <param name="package">name and optional version</param>
         /// <returns>enumerable string set of packages updated</returns>
+        [SecurityCritical]
         public IEnumerable<string> UpdatePackage(INpmPackage package)
         {
             if (package == null)
