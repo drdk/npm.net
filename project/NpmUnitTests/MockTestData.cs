@@ -610,5 +610,82 @@ namespace NpmUnitTests
             expected.Add(dependency);
             return expected;
         }
+
+        /// <summary>
+        /// Expected input for list
+        /// </summary>
+        /// <returns>Predictable output text for list test</returns>
+        public static string ListEmptyText()
+        {
+            return "{}\n";
+        }
+
+        /// <summary>
+        /// Expected output from list
+        /// </summary>
+        /// <returns>Expected result for list test</returns>
+        public static List<NpmInstalledPackage> ListEmptyExpected()
+        {
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            return expected;
+        }
+
+        /// <summary>
+        /// Expected input for install error
+        /// </summary>
+        /// <returns>Predictable output text for install error</returns>
+        public static string ErrorInstallText()
+        {
+            return
+                "npm http GET https://registry.npmjs.org/fffggghhh\n" +
+                "npm http 404 https://registry.npmjs.org/fffggghhh\n" +
+                "\n" +
+                "npm ERR! 404 'bogusmod' is not in the npm registry.\n" +
+                "npm ERR! 404 You should bug the author to publish it\n" +
+                "npm ERR! 404 \n" +
+                "npm ERR! 404 Note that you can also install from a\n" +
+                "npm ERR! 404 tarball, folder, or http url, or git url.\n" +
+                "npm ERR! \n" +
+                "npm ERR! System Windows_NT 6.1.7601\n" +
+                "npm ERR! command \"C:\\Program Files (x86)\\nodejs\\node.exe\" \"C:\\Program Files (x86)\\nodejs\\node_modules\\npm\\bin\\npm-cli.js\" \"install\" \"fffggghhh\"\n" +
+                "npm ERR! cwd C:\\src\n" +
+                "npm ERR! node -v v0.6.13\n" +
+                "npm ERR! npm -v 1.1.9\n" +
+                "npm ERR! code E404\n" +
+                "npm ERR! message 404 Not Found: bogusmod\n" +
+                "npm ERR! errno {}\n" +
+                "npm ERR! \n" +
+                "npm ERR! Additional logging details can be found in:\n" +
+                "npm ERR!     C:\\src\\npm-debug.log\n" +
+                "npm not ok";
+        }
+
+        /// <summary>
+        /// Expected exception for install error
+        /// </summary>
+        /// <returns>Predictable exception for install error</returns>
+        public static NpmException ErrorInstallExpected()
+        {
+            NpmException except = new NpmException("Failed: npm reported an error.");
+            except.NpmSystem = "Windows_NT 6.1.7601";
+            except.NpmCommand = "\"C:\\Program Files (x86)\\nodejs\\node.exe\" \"C:\\Program Files (x86)\\nodejs\\node_modules\\npm\\bin\\npm-cli.js\" \"install\" \"fffggghhh\"";
+            except.NpmCwd = "C:\\src";
+            except.NpmNodeVersion = "v0.6.13";
+            except.NpmNpmVersion = "1.1.9";
+            except.NpmCode = "E404";
+            except.NpmMessage = "404 Not Found: bogusmod";
+            except.NpmErrno = "{}";
+            except.NpmVerbose = "'bogusmod' is not in the npm registry.\n" +
+                                "You should bug the author to publish it\n" +
+                                "\n" +
+                                "Note that you can also install from a\n" +
+                                "tarball, folder, or http url, or git url.\n" +
+                                "\n" +
+                                "\n" +
+                                "Additional logging details can be found in:\n" +
+                                "    C:\\src\\npm-debug.log\n";
+
+            return except;
+        }
     }
 }

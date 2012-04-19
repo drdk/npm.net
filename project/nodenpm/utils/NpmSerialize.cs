@@ -30,6 +30,46 @@ namespace NodeNpm
         private const string ModuleSeparator = "/node_modules/";
 
         /// <summary>
+        /// Error message
+        /// </summary>
+        private const string ParseErrorInstall = "Failed: unable to parse output from install command.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string ConvertErrorInstall = "Failed: unable to convert output from install command to object.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string ParseErrorList = "Failed: unable to parse output from list command.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string ConvertErrorList = "Failed: unable to convert output from list command to object.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string ParseErrorView = "Failed: unable to parse output from view command.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string ConvertErrorView = "Failed: unable to convert output from view command to object.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string NpmReportedError = "Failed: npm reported an error.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string NpmErrorLineStart = "npm ERR! ";
+
+        /// <summary>
         /// Build path for specified dependency
         /// </summary>
         /// <param name="depends">dependency name</param>
@@ -105,12 +145,16 @@ namespace NodeNpm
             }
             catch (InvalidOperationException ex)
             {
-                throw new InvalidOperationException("Failed to parse output from list command", ex);
+                throw new NpmException(ParseErrorList, ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new NpmException(ParseErrorList, ex);
             }
 
             try
             {
-                if (listObj != null)
+                if (listObj != null && listObj.Count > 0)
                 {
                     object name = string.Empty;
                     listObj.TryGetValue("name", out name);
@@ -119,7 +163,7 @@ namespace NodeNpm
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to convert output from list command to object", ex);
+                throw new NpmException(ConvertErrorList, ex);
             }
 
             return installed;
@@ -143,12 +187,16 @@ namespace NodeNpm
             }
             catch (InvalidOperationException ex)
             {
-                throw new InvalidOperationException("Failed to parse output from list command", ex);
+                throw new NpmException(ParseErrorList, ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new NpmException(ParseErrorList, ex);
             }
 
             try
             {
-                if (listObj != null)
+                if (listObj != null && listObj.Count > 0)
                 {
                     object name = string.Empty;
                     listObj.TryGetValue("name", out name);
@@ -157,7 +205,7 @@ namespace NodeNpm
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to parse output from list command", ex);
+                throw new NpmException(ConvertErrorList, ex);
             }
 
             return matched;
@@ -180,16 +228,16 @@ namespace NodeNpm
             }
             catch (InvalidOperationException ex)
             {
-                throw new InvalidOperationException("Failed to parse output from view command", ex);
+                throw new NpmException(ParseErrorView, ex);
             }
             catch (ArgumentException ex)
             {
-                throw new InvalidOperationException("Failed to parse output from view command", ex);
+                throw new NpmException(ParseErrorView, ex);
             }
 
             try
             {
-                if (viewObj != null)
+                if (viewObj != null && viewObj.Count > 0)
                 {
                     object name;
                     viewObj.TryGetValue("name", out name);
@@ -198,7 +246,7 @@ namespace NodeNpm
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to convert output from view command to object", ex);
+                throw new NpmException(ConvertErrorView, ex);
             }
 
             return view;
@@ -342,12 +390,16 @@ namespace NodeNpm
             }
             catch (InvalidOperationException ex)
             {
-                throw new InvalidOperationException("Failed to parse output from install command", ex);
+                throw new NpmException(ParseErrorInstall, ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new NpmException(ParseErrorInstall, ex);
             }
 
             try
             {
-                if (installObj != null)
+                if (installObj != null && installObj.Count > 0)
                 {
                     foreach (KeyValuePair<string, object> module in installObj)
                     {
@@ -357,10 +409,37 @@ namespace NodeNpm
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Failed to convert output from install command to object", ex);
+                throw new NpmException(ConvertErrorInstall, ex);
             }
 
             return installs;
+        }
+
+        /// <summary>
+        /// Creates an NpmException with properties from the error output
+        /// </summary>
+        /// <param name="output">The error stream output from npm</param>
+        /// <returns>a new NpmException</returns>
+        public NpmException ExceptionFromError(string output)
+        {
+            if (output == null)
+            {
+                return null;
+            }
+
+            NpmException exception = new NpmException(NpmReportedError);
+            string[] errorLines = output.Split('\n');
+
+            foreach (string line in errorLines)
+            {
+                if (line.StartsWith(NpmErrorLineStart, StringComparison.Ordinal))
+                {
+                    string errorText = line.Substring(NpmErrorLineStart.Length);
+                    exception.SetNpmValue(errorText);
+                }
+            }
+
+            return exception;
         }
 
         /// <summary>

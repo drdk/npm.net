@@ -259,5 +259,59 @@ namespace NpmUnitTests
             actual = target.FromView(jsonview);
             Assert.AreEqual(expected, actual, "item value differs");
         }
+
+        /// <summary>
+        /// A test for FromList
+        /// </summary>
+        [TestMethod]
+        public void FromListEmptyTest()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.ListEmptyText();
+            List<NpmInstalledPackage> expected = MockTestData.ListEmptyExpected();
+
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.FromListInstalled(jsonlist);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for ExceptionFromError
+        /// </summary>
+        [TestMethod]
+        public void ExceptionFromErrorTest()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string errorText = MockTestData.ErrorInstallText();
+            NpmException expected = MockTestData.ErrorInstallExpected();
+
+            NpmException actual;
+            actual = target.ExceptionFromError(errorText);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Message, actual.Message);
+            Assert.AreEqual(expected.NpmCode, actual.NpmCode);
+            Assert.AreEqual(expected.NpmErrno, actual.NpmErrno);
+            Assert.AreEqual(expected.NpmFile, actual.NpmFile);
+            Assert.AreEqual(expected.NpmPath, actual.NpmPath);
+            Assert.AreEqual(expected.NpmType, actual.NpmType);
+            Assert.AreEqual(expected.NpmSyscall, actual.NpmSyscall);
+            Assert.AreEqual(expected.NpmSystem, actual.NpmSystem);
+            Assert.AreEqual(expected.NpmCommand, actual.NpmCommand);
+            Assert.AreEqual(expected.NpmNodeVersion, actual.NpmNodeVersion);
+            Assert.AreEqual(expected.NpmNpmVersion, actual.NpmNpmVersion);
+            Assert.AreEqual(expected.NpmMessage, actual.NpmMessage);
+            Assert.AreEqual(expected.NpmArguments, actual.NpmArguments);
+            Assert.AreEqual(expected.NpmCwd, actual.NpmCwd);
+            Assert.AreEqual(expected.NpmVerbose, actual.NpmVerbose);
+        }
     }
 }

@@ -99,29 +99,29 @@ namespace NodeNpm
         /// </summary>
         /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool Equals(INpmSearchResultPackage package)
+        public bool Equals(INpmSearchResultPackage other)
         {
-            if (package == null)
+            if (other == null)
             {
                 return false;
             }
 
-            if (this.Name != package.Name)
+            if (this.Name != other.Name)
             {
                 return false;
             }
 
-            if (this.Description != package.Description)
+            if (this.Description != other.Description)
             {
                 return false;
             }
 
-            if (this.Author != package.Author)
+            if (this.Author != other.Author)
             {
                 return false;
             }
 
-            if (!NpmPackage.IsSameStringEnumeration(this.Keywords, package.Keywords))
+            if (!NpmPackage.IsSameStringEnumeration(this.Keywords, other.Keywords))
             {
                 return false;
             }
@@ -132,7 +132,7 @@ namespace NodeNpm
         /// <summary>
         /// Test if another object matches this one
         /// </summary>
-        /// <param name="package">object to compare</param>
+        /// <param name="obj">object to compare</param>
         /// <returns>true if match, false if not matched</returns>
         public override bool Equals(object obj)
         {

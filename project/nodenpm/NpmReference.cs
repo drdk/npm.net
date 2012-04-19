@@ -50,19 +50,19 @@ namespace NodeNpm
         /// </summary>
         /// <param name="package">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool Equals(INpmReference package)
+        public bool Equals(INpmReference other)
         {
-            if (package == null)
+            if (other == null)
             {
                 return false;
             }
 
-            if (this.Type != package.Type)
+            if (this.Type != other.Type)
             {
                 return false;
             }
 
-            if (this.Reference != package.Reference)
+            if (this.Reference != other.Reference)
             {
                 return false;
             }
@@ -73,7 +73,7 @@ namespace NodeNpm
         /// <summary>
         /// Test if another object matches this one
         /// </summary>
-        /// <param name="package">object to compare</param>
+        /// <param name="obj">object to compare</param>
         /// <returns>true if match, false if not matched</returns>
         public override bool Equals(object obj)
         {

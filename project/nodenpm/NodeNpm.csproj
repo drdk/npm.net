@@ -21,6 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>Properties\MinimumRecommendedRulesMod.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +31,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,7 +54,8 @@
     <Compile Include="interfaces\INpmSerialize.cs" />
     <Compile Include="NpmApi.cs" />
     <Compile Include="NpmClient.cs" />
-    <Compile Include="NpmFactory.cs" />
+    <Compile Include="NpmException.cs" />
+    <Compile Include="utils\NpmFactory.cs" />
     <Compile Include="NpmInstalledPackage.cs" />
     <Compile Include="NpmPackage.cs" />
     <Compile Include="NpmPackageDependency.cs" />
@@ -57,8 +63,8 @@
     <Compile Include="NpmReference.cs" />
     <Compile Include="NpmRemotePackage.cs" />
     <Compile Include="NpmSearchResultPackage.cs" />
-    <Compile Include="NpmSerialize.cs" />
-    <Compile Include="NpmSync.cs" />
+    <Compile Include="utils\NpmSerialize.cs" />
+    <Compile Include="utils\NpmSync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

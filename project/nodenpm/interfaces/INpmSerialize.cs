@@ -58,5 +58,12 @@ namespace NodeNpm
         /// <param name="output">text output</param>
         /// <returns>enumerable INpmPackage properties</returns>
         IEnumerable<INpmInstalledPackage> FromInstall(string output);
+
+        /// <summary>
+        /// Creates an NpmException with properties from the error output
+        /// </summary>
+        /// <param name="output">The error stream output from npm</param>
+        /// <returns>a new NpmException</returns>
+        NpmException ExceptionFromError(string output);
     }
 }
