@@ -125,7 +125,7 @@ namespace NodeNpm
         /// <summary>
         /// Test if another object matches this one
         /// </summary>
-        /// <param name="package">object to compare</param>
+        /// <param name="obj">object to compare</param>
         /// <returns>true if match, false if not matched</returns>
         public override bool Equals(object obj)
         {

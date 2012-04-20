@@ -53,26 +53,26 @@ namespace NodeNpm
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmPackage to compare</param>
+        /// <param name="other">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool Equals(INpmPackageDependency package)
+        public bool Equals(INpmPackageDependency other)
         {
-            if (package == null)
+            if (other == null)
             {
                 return false;
             }
 
-            if (this.Name != package.Name)
+            if (this.Name != other.Name)
             {
                 return false;
             }
 
-            if (this.Version != package.Version)
+            if (this.Version != other.Version)
             {
                 return false;
             }
 
-            if (this.VersionRange != package.VersionRange)
+            if (this.VersionRange != other.VersionRange)
             {
                 return false;
             }
@@ -83,7 +83,7 @@ namespace NodeNpm
         /// <summary>
         /// Test if another object matches this one
         /// </summary>
-        /// <param name="package">object to compare</param>
+        /// <param name="obj">object to compare</param>
         /// <returns>true if match, false if not matched</returns>
         public override bool Equals(object obj)
         {

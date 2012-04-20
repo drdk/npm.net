@@ -152,51 +152,51 @@ namespace NodeNpm
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmPackage to compare</param>
+        /// <param name="other">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool Equals(INpmRemotePackage package)
+        public bool Equals(INpmRemotePackage other)
         {
-            if (package == null)
+            if (other == null)
             {
                 return false;
             }
 
-            if (this.Name != package.Name)
+            if (this.Name != other.Name)
             {
                 return false;
             }
 
-            if (this.Version != package.Version)
+            if (this.Version != other.Version)
             {
                 return false;
             }
 
-            if (this.Description != package.Description)
+            if (this.Description != other.Description)
             {
                 return false;
             }
 
-            if (!NpmPackage.IsSameStringEnumeration(this.Versions, package.Versions))
+            if (!NpmPackage.IsSameStringEnumeration(this.Versions, other.Versions))
             {
                 return false;
             }
 
-            if (!NpmPackage.IsSameStringEnumeration(this.Maintainers, package.Maintainers))
+            if (!NpmPackage.IsSameStringEnumeration(this.Maintainers, other.Maintainers))
             {
                 return false;
             }
 
-            if (!NpmPackage.IsSameStringEnumeration(this.Contributors, package.Contributors))
+            if (!NpmPackage.IsSameStringEnumeration(this.Contributors, other.Contributors))
             {
                 return false;
             }
 
-            if (this.Homepage != package.Homepage)
+            if (this.Homepage != other.Homepage)
             {
                 return false;
             }
 
-            if (this.Author != package.Author)
+            if (this.Author != other.Author)
             {
                 return false;
             }
@@ -207,7 +207,7 @@ namespace NodeNpm
         /// <summary>
         /// Test if another object matches this one
         /// </summary>
-        /// <param name="package">object to compare</param>
+        /// <param name="obj">object to compare</param>
         /// <returns>true if match, false if not matched</returns>
         public override bool Equals(object obj)
         {

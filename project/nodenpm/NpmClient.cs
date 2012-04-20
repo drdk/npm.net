@@ -10,7 +10,9 @@ namespace NodeNpm
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
+    using System.Security.Permissions;
     using System.Text;
     using System.Timers;
 
@@ -42,7 +44,17 @@ namespace NodeNpm
         /// <summary>
         /// Error message
         /// </summary>
-        private const string StartWin32Exception = "Fatal: process create failed due to Win32 error";
+        private const string NodeExeNotExistFormat = "The node.exe file is not found at {0}. Please check installation path.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string NpmJSNotExistFormat = "The npm-cli.js file is not found at {0}. Please check installation.";
+
+        /// <summary>
+        /// Error message
+        /// </summary>
+        private const string StartWin32Exception = "Fatal: node process create failed. Verify inner exception message for details";
 
         /// <summary>
         /// Error message
@@ -185,15 +197,33 @@ namespace NodeNpm
         /// <param name="args">remainder of npm command line</param>
         /// <returns>exit code. 0 is success</returns>
         /// <remarks>LastExecuteOutput and LastExecuteError will be set</remarks>
+        [PermissionSetAttribute(SecurityAction.LinkDemand, Name = "FullTrust")]
         public int Execute(string cmd, string args)
         {
+            this.lastExecuteErrorText = string.Empty;
+            this.lastExecuteOutput = string.Empty;
+
             if (string.IsNullOrWhiteSpace(cmd))
             {
                 throw new ArgumentNullException("cmd");
             }
 
-            // npm-cli.js full path in quotes with space trailer
-            string npmcli = "\"" + Path.Combine(this.InstallPath, this.NpmRelativePath) + "\" ";
+            string nodepath = Path.Combine(this.InstallPath, NodeExe);
+            if (!File.Exists(nodepath))
+            {
+                string error = string.Format(CultureInfo.InvariantCulture, NodeExeNotExistFormat, nodepath);
+                throw new NpmException(error);
+            }
+
+            string npmcliPath = Path.Combine(this.InstallPath, this.NpmRelativePath);
+            if (!File.Exists(npmcliPath))
+            {
+                string error = string.Format(CultureInfo.InvariantCulture, NpmJSNotExistFormat, npmcliPath);
+                throw new NpmException(error);
+            }
+
+            // npm-cli.js full path in quotes with space trailer for command line
+            string npmcli = "\"" + npmcliPath + "\" ";
 
             using (Process nodeNpm = new Process())
             {
@@ -208,7 +238,7 @@ namespace NodeNpm
                     nodeNpm.StartInfo.Arguments = npmcli + cmd + " " + args;
                 }
 
-                nodeNpm.StartInfo.FileName = Path.Combine(this.InstallPath, NodeExe);
+                nodeNpm.StartInfo.FileName = nodepath;
                 nodeNpm.StartInfo.UseShellExecute = false;
                 nodeNpm.StartInfo.WorkingDirectory = this.WorkingDirectory;
                 nodeNpm.StartInfo.CreateNoWindow = true;
@@ -224,7 +254,7 @@ namespace NodeNpm
                     if (!started)
                     {
                         // node may already be running
-                        throw new InvalidOperationException(StartFailed + nodeNpm.StartInfo.FileName);
+                        throw new NpmException(StartFailed + nodeNpm.StartInfo.FileName);
                     }
 
                     nodeNpm.BeginOutputReadLine();
@@ -233,7 +263,7 @@ namespace NodeNpm
                 catch (Win32Exception ex)
                 {
                     NpmSync.RemNpmSync(nodeNpm);
-                    throw new InvalidOperationException(StartWin32Exception, ex);
+                    throw new NpmException(StartWin32Exception, ex);
                 }
 
                 try
@@ -250,7 +280,7 @@ namespace NodeNpm
                         if (!exited)
                         {
                             nodeNpm.Kill();
-                            throw new InvalidOperationException(WaitTimeout);
+                            throw new NpmException(WaitTimeout);
                         }
 
                         // need extra wait to ensure output flushed
@@ -260,12 +290,12 @@ namespace NodeNpm
                 catch (Win32Exception ex)
                 {
                     NpmSync.RemNpmSync(nodeNpm);
-                    throw new InvalidOperationException(WaitWin32Exception, ex);
+                    throw new NpmException(WaitWin32Exception, ex);
                 }
                 catch (SystemException ex)
                 {
                     NpmSync.RemNpmSync(nodeNpm);
-                    throw new InvalidOperationException(WaitSystemException, ex);
+                    throw new NpmException(WaitSystemException, ex);
                 }
 
                 NpmSync sync = NpmSync.FindNpmSync(nodeNpm);

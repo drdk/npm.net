@@ -138,6 +138,30 @@ namespace NpmUnitTests
         /// A test for FindDependenciesToBeInstalled
         /// </summary>
         [TestMethod]
+        public void FindDependenciesToBeInstalledEmptyTest()
+        {
+            string wd = "c:\\root\\project1";
+            string registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
+            NpmPackage package = new NpmPackage("outdated1", null);
+            List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
+            IEnumerable<INpmPackageDependency> actual;
+            actual = target.FindDependenciesToBeInstalled(package);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (INpmPackageDependency actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for FindDependenciesToBeInstalled
+        /// </summary>
+        [TestMethod]
         public void FindDependenciesToBeInstalledMultiTest()
         {
             string wd = "c:\\root\\outdatedmulti";
@@ -195,6 +219,29 @@ namespace NpmUnitTests
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             List<NpmInstalledPackage> expected = MockTestData.List1Expected();
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.GetInstalledPackages();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for GetInstalledPackages
+        /// </summary>
+        [TestMethod]
+        public void GetInstalledPackagesEmptyTest()
+        {
+            string wd = "c:\\root\\empty1";
+            string registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
+            List<NpmInstalledPackage> expected = MockTestData.ListEmptyExpected();
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.GetInstalledPackages();
             Assert.IsNotNull(actual);
@@ -398,6 +445,45 @@ namespace NpmUnitTests
             target.ApiClient = expected;
             actual = target.ApiClient;
             Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// A test for InstallPackage exception
+        /// </summary>
+        [TestMethod]
+        public void InstallPackageFailureTest()
+        {
+            string wd = "c:\\root\\project1";
+            string registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
+            NpmPackage package = new NpmPackage("bogusmod", null);
+            NpmException expected = MockTestData.ErrorInstallExpected();
+            try
+            {
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.InstallPackage(package);
+            Assert.Fail("Expected exception");
+            }
+            catch (NpmException ex)
+            {
+                Assert.IsNotNull(ex);
+                Assert.AreEqual(expected.Message, ex.Message);
+                Assert.AreEqual(expected.NpmCode, ex.NpmCode);
+                Assert.AreEqual(expected.NpmErrno, ex.NpmErrno);
+                Assert.AreEqual(expected.NpmFile, ex.NpmFile);
+                Assert.AreEqual(expected.NpmPath, ex.NpmPath);
+                Assert.AreEqual(expected.NpmType, ex.NpmType);
+                Assert.AreEqual(expected.NpmSyscall, ex.NpmSyscall);
+                Assert.AreEqual(expected.NpmSystem, ex.NpmSystem);
+                Assert.AreEqual(expected.NpmCommand, ex.NpmCommand);
+                Assert.AreEqual(expected.NpmNodeVersion, ex.NpmNodeVersion);
+                Assert.AreEqual(expected.NpmNpmVersion, ex.NpmNpmVersion);
+                Assert.AreEqual(expected.NpmMessage, ex.NpmMessage);
+                Assert.AreEqual(expected.NpmArguments, ex.NpmArguments);
+                Assert.AreEqual(expected.NpmCwd, ex.NpmCwd);
+                Assert.AreEqual(expected.NpmVerbose, ex.NpmVerbose);
+            }
         }
     }
 }

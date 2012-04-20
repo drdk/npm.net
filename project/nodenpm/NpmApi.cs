@@ -81,23 +81,6 @@ namespace NodeNpm
         /// </summary>
         private INpmSerialize Serializer { get; set; }
 
-       /// <summary>
-        /// Get npm version. Wraps 'npm --version'
-        /// </summary>
-        /// <returns>version string</returns>
-        public string GetInstalledVersion()
-        {
-            int rc = this.Client.Execute("--version", null);
-            if (rc == 0)
-            {
-                string output = this.Client.LastExecuteOutput;
-                return output.Trim();
-            }
-
-            // TODO throw exception if unexpected response
-            return null;
-        }
-
         /// <summary>
         /// Set working directory for dependency.
         /// </summary>
@@ -127,6 +110,18 @@ namespace NodeNpm
         }
 
         /// <summary>
+        /// Get npm version. Wraps 'npm --version'
+        /// </summary>
+        /// <returns>version string</returns>
+        public string GetInstalledVersion()
+        {
+            // --version always returns success
+            this.Client.Execute("--version", null);
+            string output = this.Client.LastExecuteOutput;
+            return output.Trim();
+        }
+
+        /// <summary>
         /// Get installed modules in project. Wraps 'npm list'
         /// </summary>
         /// <returns>enumerable NpmInstalledPackage properties</returns>
@@ -139,7 +134,11 @@ namespace NodeNpm
                 return this.Serializer.FromListInstalled(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -162,7 +161,11 @@ namespace NodeNpm
                 return this.Serializer.FromView(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -186,7 +189,11 @@ namespace NodeNpm
                 return this.Serializer.FromSearchResult(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -224,7 +231,11 @@ namespace NodeNpm
                 return this.Serializer.FromInstall(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -241,7 +252,11 @@ namespace NodeNpm
                 return this.Serializer.FromOutdatedDependency(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -264,7 +279,11 @@ namespace NodeNpm
                 return this.Serializer.FromOutdatedDependency(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -292,7 +311,11 @@ namespace NodeNpm
                 return this.Serializer.FromInstall(output);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 
@@ -314,7 +337,11 @@ namespace NodeNpm
                 return true;
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return false;
         }
 
@@ -332,7 +359,11 @@ namespace NodeNpm
                 return this.Serializer.FromListMatchInstalled(output, package);
             }
 
-            // TODO handle unexpected response
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
             return null;
         }
 

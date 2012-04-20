@@ -204,6 +204,11 @@ namespace NpmUnitTests
                 this.lastExecuteOutput = MockTestData.ListProblems1Text();
                 return 0;
             }
+            else if (wd.IndexOf("empty1") > 0)
+            {
+                this.lastExecuteOutput = MockTestData.ListEmptyText();
+                return 0;
+            }
 
             this.lastExecuteErrorText = "Unknown working directory\n";
             return 1;
@@ -242,6 +247,11 @@ namespace NpmUnitTests
             {
                 this.lastExecuteOutput = MockTestData.Install1Text();
                 return 0;
+            }
+            else if (args.StartsWith("bogusmod", StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.lastExecuteErrorText = MockTestData.ErrorInstallText();
+                return 1;
             }
 
             this.lastExecuteErrorText = "Unknown test arg\n";

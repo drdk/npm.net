@@ -1,7 +1,8 @@
-project/nodenpm/StyleCop.Cache
+StyleCop.Cache
 *.exe
 *.obj
 *.suo
+*.user
 project/NpmApiSample/bin/
 project/NpmApiSample/obj/
 project/NpmUnitTests/bin/

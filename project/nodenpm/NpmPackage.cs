@@ -14,7 +14,7 @@ namespace NodeNpm
     /// <summary>
     /// NpmPackage has name and optional version
     /// </summary>
-    public class NpmPackage : INpmPackage , IEquatable<INpmPackage>
+    public class NpmPackage : INpmPackage, IEquatable<INpmPackage>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmPackage" /> class.
@@ -48,21 +48,21 @@ namespace NodeNpm
         /// <summary>
         /// Test if another package matches this one
         /// </summary>
-        /// <param name="package">NpmPackage to compare</param>
+        /// <param name="other">NpmPackage to compare</param>
         /// <returns>true if match, false if not matched</returns>
-        public bool Equals(INpmPackage package)
+        public bool Equals(INpmPackage other)
         {
-            if (package == null)
+            if (other == null)
             {
                 return false;
             }
 
-            if (this.Name != package.Name)
+            if (this.Name != other.Name)
             {
                 return false;
             }
 
-            if (this.Version != package.Version)
+            if (this.Version != other.Version)
             {
                 return false;
             }
@@ -73,7 +73,7 @@ namespace NodeNpm
         /// <summary>
         /// Test if another object matches this one
         /// </summary>
-        /// <param name="package">object to compare</param>
+        /// <param name="obj">object to compare</param>
         /// <returns>true if match, false if not matched</returns>
         public override bool Equals(object obj)
         {

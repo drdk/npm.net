@@ -106,7 +106,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void InstallTest()
         {
-            string wd = string.Empty;
+            string wd = "c:\\root\\project1";
             string registry = string.Empty;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
@@ -135,6 +135,29 @@ namespace NpmUnitTests
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             List<NpmInstalledPackage> expected = MockTestData.List1Expected();
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.List();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for List
+        /// </summary>
+        [TestMethod]
+        public void ListEmptyTest()
+        {
+            string wd = "c:\\root\\empty1";
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            List<NpmInstalledPackage> expected = MockTestData.ListEmptyExpected();
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.List();
             Assert.IsNotNull(actual);
@@ -297,6 +320,45 @@ namespace NpmUnitTests
             {
                 Assert.IsNotNull(actual);
                 Assert.AreEqual(expected, actual);
+            }
+        }
+
+        /// <summary>
+        /// A test for Install failure
+        /// </summary>
+        [TestMethod]
+        public void InstallFailsTest()
+        {
+            string wd = "c:\\root\\project1";
+            string registry = string.Empty;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            NpmPackage package = new NpmPackage("bogusmod", null);
+            NpmException expected = MockTestData.ErrorInstallExpected();
+            try
+            {
+                IEnumerable<INpmInstalledPackage> actual;
+                actual = target.Install(package);
+                Assert.Fail("Expected exception");
+            }
+            catch (NpmException ex)
+            {
+                Assert.IsNotNull(ex);
+                Assert.AreEqual(expected.Message, ex.Message);
+                Assert.AreEqual(expected.NpmCode, ex.NpmCode);
+                Assert.AreEqual(expected.NpmErrno, ex.NpmErrno);
+                Assert.AreEqual(expected.NpmFile, ex.NpmFile);
+                Assert.AreEqual(expected.NpmPath, ex.NpmPath);
+                Assert.AreEqual(expected.NpmType, ex.NpmType);
+                Assert.AreEqual(expected.NpmSyscall, ex.NpmSyscall);
+                Assert.AreEqual(expected.NpmSystem, ex.NpmSystem);
+                Assert.AreEqual(expected.NpmCommand, ex.NpmCommand);
+                Assert.AreEqual(expected.NpmNodeVersion, ex.NpmNodeVersion);
+                Assert.AreEqual(expected.NpmNpmVersion, ex.NpmNpmVersion);
+                Assert.AreEqual(expected.NpmMessage, ex.NpmMessage);
+                Assert.AreEqual(expected.NpmArguments, ex.NpmArguments);
+                Assert.AreEqual(expected.NpmCwd, ex.NpmCwd);
+                Assert.AreEqual(expected.NpmVerbose, ex.NpmVerbose);
             }
         }
     }
