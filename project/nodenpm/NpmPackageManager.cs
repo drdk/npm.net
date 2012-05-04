@@ -15,14 +15,12 @@ namespace NodeNpm
     /// <summary>
     /// High level class to manage NPM installation
     /// </summary>
-    [SecurityCritical]
     public class NpmPackageManager : INpmPackageManager
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NpmPackageManager" /> class.
         /// </summary>
         /// <param name="wd">current project directory</param>
-        [SecurityCritical]
         public NpmPackageManager(string wd)
         {
             this.ApiClient = new NpmApi(wd);
@@ -32,9 +30,8 @@ namespace NodeNpm
         /// Initializes a new instance of the <see cref="NpmPackageManager" /> class.
         /// </summary>
         /// <param name="wd">current project directory</param>
-        /// <param name="registry">registry URL if not using default</param>
-        [SecurityCritical]
-        public NpmPackageManager(string wd, string registry)
+        /// <param name="registry">registry URI if not using default</param>
+        public NpmPackageManager(string wd, Uri registry)
         {
             this.ApiClient = new NpmApi(wd, registry);
         }
@@ -44,9 +41,8 @@ namespace NodeNpm
         /// </summary>
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">current project directory</param>
-        /// <param name="registry">Registry URL if not using default</param>
-        [SecurityCritical]
-        public NpmPackageManager(NpmFactory factory, string wd, string registry)
+        /// <param name="registry">Registry URI if not using default</param>
+        public NpmPackageManager(NpmFactory factory, string wd, Uri registry)
         {
             this.ApiClient = new NpmApi(factory, wd, registry);
         }
@@ -56,9 +52,7 @@ namespace NodeNpm
         /// </summary>
         public INpmApi ApiClient
         { 
-            [SecurityCritical]
             get;
-            [SecurityCritical]
             set;
         }
 
@@ -67,7 +61,6 @@ namespace NodeNpm
         /// </summary>
         public INpmClient NpmClient
         {
-            [SecurityCritical]
             get
             {
                 return this.ApiClient.NpmClient;
@@ -79,7 +72,6 @@ namespace NodeNpm
         /// </summary>
         /// <param name="package">Package to be checked</param>
         /// <returns>enumerable INpmInstalledPackage set</returns>
-        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> FindDependenciesToBeInstalled(INpmPackage package)
         {
             if (package == null)
@@ -130,7 +122,6 @@ namespace NodeNpm
         /// </summary>
         /// <param name="packageIds">set of names</param>
         /// <returns>enumerable INpmRemotePackage set</returns>
-        [SecurityCritical]
         public IEnumerable<INpmRemotePackage> FindPackages(IEnumerable<string> packageIds)
         {
             if (packageIds == null)
@@ -158,27 +149,30 @@ namespace NodeNpm
         /// Get installed packages within current project
         /// </summary>
         /// <returns>enumerable INpmInstalledPackage set</returns>
-        [SecurityCritical]
         public IEnumerable<INpmInstalledPackage> GetInstalledPackages()
         {
-            return this.ApiClient.List();
+            return this.ApiClient.ListChildren();
         }
 
         /// <summary>
         /// Get list of available updates for installed packages
         /// </summary>
         /// <returns>enumerable INpmPackageDependency set</returns>
-        [SecurityCritical]
         public IEnumerable<INpmPackageDependency> GetPackagesWithUpdates()
         {
-            return this.ApiClient.Outdated();
+            IEnumerable<INpmInstalledPackage> children = this.ApiClient.ListChildren();
+            if (children != null && children.Count() > 0)
+            {
+                return this.ApiClient.Outdated(children);
+            }
+
+            return new List<INpmPackageDependency>();
         }
 
         /// <summary>
         /// Find all remote packages
         /// </summary>
         /// <returns>enumerable INpmSearchResultPackage set</returns>
-        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> GetRemotePackages()
         {
             return this.ApiClient.Search(null);
@@ -188,11 +182,9 @@ namespace NodeNpm
         /// Install sepcified package
         /// </summary>
         /// <param name="package">name and optional version to be installed</param>
-        /// <returns>enumerable INpmPackage set of all installed packages</returns>
-        [SecurityCritical]
-        public IEnumerable<INpmInstalledPackage> InstallPackage(INpmPackage package)
+        public void InstallPackage(INpmPackage package)
         {
-            return this.ApiClient.Install(package);
+            this.ApiClient.Install(package);
         }
 
         /// <summary>
@@ -200,7 +192,6 @@ namespace NodeNpm
         /// </summary>
         /// <param name="package">name and optional version to test</param>
         /// <returns>INpmInstalledPackage or null</returns>
-        [SecurityCritical]
         public INpmInstalledPackage IsPackageInstalled(INpmPackage package)
         {
             return this.ApiClient.TestInstalled(package);
@@ -211,7 +202,6 @@ namespace NodeNpm
         /// </summary>
         /// <param name="searchTerms">set of terms</param>
         /// <returns>enumerable INpmSearchResultPackage set</returns>
-        [SecurityCritical]
         public IEnumerable<INpmSearchResultPackage> SearchRemotePackages(string searchTerms)
         {
             return this.ApiClient.Search(searchTerms);
@@ -221,9 +211,7 @@ namespace NodeNpm
         /// Uninstall specified package from current project
         /// </summary>
         /// <param name="package">name of package</param>
-        /// <returns>enumerable string set of packages removed</returns>
-        [SecurityCritical]
-        public IEnumerable<string> UninstallPackage(INpmPackage package)
+        public void UninstallPackage(INpmPackage package)
         {
             if (package == null)
             {
@@ -236,7 +224,7 @@ namespace NodeNpm
             IEnumerable<INpmInstalledPackage> matchedList = beforePackages.Where(r => r.Name == package.Name).AsEnumerable();
             if (matchedList == null || matchedList.Count() == 0)
             {
-                return null;
+                return;
             }
 
             INpmInstalledPackage matched = matchedList.First();
@@ -249,36 +237,13 @@ namespace NodeNpm
             bool uninstalled = this.ApiClient.Uninstall(package.Name);
 
             this.ApiClient.SetDependencyDirectory(null);
-
-            if (uninstalled)
-            {
-                IEnumerable<INpmInstalledPackage> afterPackages = this.ApiClient.List();
-
-                if (beforePackages != null && afterPackages != null)
-                {
-                    List<string> uninstalledList = new List<string>();
-                    foreach (INpmInstalledPackage before in beforePackages)
-                    {
-                        if (!afterPackages.Where(r => r.Name == before.Name && !r.IsMissing).Any())
-                        {
-                            uninstalledList.Add(before.Name);
-                        }
-                    }
-
-                    return uninstalledList;
-                }
-            }
-
-            return null;
         }
 
         /// <summary>
         /// Update specified package in current directory
         /// </summary>
         /// <param name="package">name and optional version</param>
-        /// <returns>enumerable string set of packages updated</returns>
-        [SecurityCritical]
-        public IEnumerable<string> UpdatePackage(INpmPackage package)
+        public void UpdatePackage(INpmPackage package)
         {
             if (package == null)
             {
@@ -297,12 +262,13 @@ namespace NodeNpm
 
             // find package, and build path if needed
             IEnumerable<INpmInstalledPackage> matchedList = beforePackages.Where(r => r.Name == package.Name).AsEnumerable();
-            if (matchedList == null || matchedList.Count() == 0)
+            INpmInstalledPackage matched = null;
+            if (matchedList != null && matchedList.Count() > 0)
             {
-                return null;
+                matched = matchedList.First();
             }
 
-            INpmInstalledPackage matched = matchedList.First();
+            // update the package descendents
             if (matched != null && matched.HasDependencies)
             {
                 if (!string.IsNullOrWhiteSpace(matched.Name))
@@ -311,29 +277,9 @@ namespace NodeNpm
                 }
 
                 IEnumerable<INpmInstalledPackage> updatedChildren = this.ApiClient.Update(null);
-                if (updatedChildren != null && updatedChildren.Count() > 0)
-                {
-                    updatedList = updatedList.Concat(updatedChildren);
-                }
 
                 this.ApiClient.SetDependencyDirectory(null);
             }
-
-            if (updatedList != null)
-            {
-                List<string> names = new List<string>();
-                foreach (INpmInstalledPackage updated in updatedList)
-                {
-                    if (!string.IsNullOrWhiteSpace(updated.Name))
-                    {
-                        names.Add(updated.Name);
-                    }
-                }
-
-                return names;
-            }
-
-            return null;
         }
     }
 }

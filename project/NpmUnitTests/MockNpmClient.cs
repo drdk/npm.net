@@ -66,9 +66,9 @@ namespace NpmUnitTests
         public string WorkingDirectory { get; set; }
 
         /// <summary>
-        /// Gets or sets URL of remote registry. Only set if not using default NPM.
+        /// Gets or sets URI of remote registry. Only set if not using default NPM.
         /// </summary>
-        public string Registry { get; set; }
+        public Uri Registry { get; set; }
 
         /// <summary>
         /// Gets or sets HTTP Proxy URL
@@ -282,6 +282,11 @@ namespace NpmUnitTests
             else
             {
                 if (args == null)
+                {
+                    this.lastExecuteOutput = MockTestData.Outdated1Text();
+                    return 0;
+                }
+                else if (args.IndexOf("underscore") > 0)
                 {
                     this.lastExecuteOutput = MockTestData.Outdated1Text();
                     return 0;

@@ -3,6 +3,7 @@ StyleCop.Cache
 *.obj
 *.suo
 *.user
+*.log
 project/NpmApiSample/bin/
 project/NpmApiSample/obj/
 project/NpmUnitTests/bin/

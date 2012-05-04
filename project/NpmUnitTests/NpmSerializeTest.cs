@@ -201,6 +201,29 @@ namespace NpmUnitTests
         }
 
         /// <summary>
+        /// A test for FromListInstalledChildren
+        /// </summary>
+        [TestMethod]
+        public void FromListInstalledChildrenTest()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.List1Text();
+            List<NpmInstalledPackage> expected = MockTestData.List1ChildrenExpected();
+
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.FromListInstalledChildren(jsonlist);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
         /// A test for FromOutdatedDependency
         /// </summary>
         [TestMethod]

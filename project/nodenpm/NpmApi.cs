@@ -36,8 +36,8 @@ namespace NodeNpm
         /// Initializes a new instance of the <see cref="NpmApi" /> class.
         /// </summary>
         /// <param name="wd">Working directory for project</param>
-        /// <param name="registry">URL for remote registry</param>
-        public NpmApi(string wd, string registry)
+        /// <param name="registry">URI for remote registry</param>
+        public NpmApi(string wd, Uri registry)
         {
             NpmFactory factory = new NpmFactory();
             this.Initialize(factory, wd, registry);
@@ -49,8 +49,8 @@ namespace NodeNpm
         /// </summary>
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">Working directory for project</param>
-        /// <param name="registry">URL for remote registry</param>
-        public NpmApi(NpmFactory factory, string wd, string registry)
+        /// <param name="registry">URI for remote registry</param>
+        public NpmApi(NpmFactory factory, string wd, Uri registry)
         {
             this.Initialize(factory, wd, registry);
         }
@@ -132,6 +132,27 @@ namespace NodeNpm
             {
                 string output = this.Client.LastExecuteOutput;
                 return this.Serializer.FromListInstalled(output);
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get installed child modules in project. Wraps 'npm list'
+        /// </summary>
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        public IEnumerable<INpmInstalledPackage> ListChildren()
+        {
+            int rc = this.Client.Execute("list", "--json");
+            if (rc == 0)
+            {
+                string output = this.Client.LastExecuteOutput;
+                return this.Serializer.FromListInstalledChildren(output);
             }
 
             if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
@@ -288,6 +309,39 @@ namespace NodeNpm
         }
 
         /// <summary>
+        /// Check if dependency is outdated. Wraps 'npm outdated name name2'
+        /// </summary>
+        /// <param name="packages">set of packages to test</param>
+        /// <returns>enumerable set of packages needing updates</returns>
+        public IEnumerable<INpmPackageDependency> Outdated(IEnumerable<INpmPackage> packages)
+        {
+            if (packages == null || packages.Count() == 0)
+            {
+                throw new ArgumentException("packages is required");
+            }
+
+            string namelist = string.Empty;
+            foreach (INpmPackage package in packages)
+            {
+                namelist = namelist + " " + package.Name;
+            }
+
+            int rc = this.Client.Execute("outdated", namelist);
+            if (rc == 0)
+            {
+                string output = this.Client.LastExecuteOutput;
+                return this.Serializer.FromOutdatedDependency(output);
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Update named package. Wraps 'npm update name'
         /// </summary>
         /// <param name="name">name of package</param>
@@ -373,7 +427,7 @@ namespace NodeNpm
         /// <param name="factory">NpmFactory class</param>
         /// <param name="wd">working directory for project</param>
         /// <param name="registry">URL for remote registry</param>
-        private void Initialize(NpmFactory factory, string wd, string registry)
+        private void Initialize(NpmFactory factory, string wd, Uri registry)
         {
             // first get default client
             this.Client = factory.GetClient(null);
@@ -384,7 +438,7 @@ namespace NodeNpm
             this.Client = factory.GetClient(this.NpmVersion);
             this.Serializer = factory.GetSerialize(this.NpmVersion);
 
-            if (!string.IsNullOrWhiteSpace(registry))
+            if (registry != null)
             {
                 this.Client.Registry = registry;
             }

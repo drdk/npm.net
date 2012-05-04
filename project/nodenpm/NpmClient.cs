@@ -86,10 +86,7 @@ namespace NodeNpm
         /// </summary>
         public NpmClient()
         {
-            this.WorkingDirectory = Environment.CurrentDirectory;
-            this.Timeout = 0;
-            this.InstallPath = Environment.ExpandEnvironmentVariables(DefInstallPath);
-            this.NpmRelativePath = DefNpmRelativePath;
+            this.Initialize(Environment.CurrentDirectory);
         }
 
         /// <summary>
@@ -99,10 +96,7 @@ namespace NodeNpm
         /// <param name="wd">project directory</param>
         public NpmClient(string wd)
         {
-            this.WorkingDirectory = wd;
-            this.Timeout = 0;
-            this.InstallPath = Environment.ExpandEnvironmentVariables(DefInstallPath);
-            this.NpmRelativePath = DefNpmRelativePath;
+            this.Initialize(wd);
         }
 
         /// <summary>
@@ -135,7 +129,7 @@ namespace NodeNpm
         /// <summary>
         /// Gets or sets URL of remote registry. Only set if not using default NPM.
         /// </summary>
-        public string Registry
+        public Uri Registry
         {
             get;
             set;
@@ -227,15 +221,32 @@ namespace NodeNpm
 
             using (Process nodeNpm = new Process())
             {
+                NpmSync sync;
                 nodeNpm.StartInfo.RedirectStandardError = true;
                 nodeNpm.StartInfo.RedirectStandardOutput = true;
+                string config = string.Empty;
+                if (this.Registry != null)
+                {
+                    config = config + " --registry " + this.Registry.ToString();
+                }
+
+                if (!string.IsNullOrWhiteSpace(this.HttpProxy))
+                {
+                    config = config + " --proxy " + this.HttpProxy;
+                }
+
+                if (!string.IsNullOrWhiteSpace(this.HttpsProxy))
+                {
+                    config = config + " --https-proxy " + this.HttpsProxy;
+                }
+
                 if (string.IsNullOrWhiteSpace(args))
                 {
-                    nodeNpm.StartInfo.Arguments = npmcli + cmd;
+                    nodeNpm.StartInfo.Arguments = npmcli + cmd + config;
                 }
                 else
                 {
-                    nodeNpm.StartInfo.Arguments = npmcli + cmd + " " + args;
+                    nodeNpm.StartInfo.Arguments = npmcli + cmd + config + " " + args;
                 }
 
                 nodeNpm.StartInfo.FileName = nodepath;
@@ -244,7 +255,7 @@ namespace NodeNpm
                 nodeNpm.StartInfo.CreateNoWindow = true;
 
                 // It is not safe to read output and error synchronously
-                NpmSync.AddNpmSync(nodeNpm);
+                sync = NpmSync.AddNpmSync(nodeNpm);
                 nodeNpm.OutputDataReceived += new DataReceivedEventHandler(StandardOutputHandler);
                 nodeNpm.ErrorDataReceived += new DataReceivedEventHandler(ErrorOutputHandler);
 
@@ -262,7 +273,7 @@ namespace NodeNpm
                 }
                 catch (Win32Exception ex)
                 {
-                    NpmSync.RemNpmSync(nodeNpm);
+                    NpmSync.RemNpmSync(sync);
                     throw new NpmException(StartWin32Exception, ex);
                 }
 
@@ -279,6 +290,7 @@ namespace NodeNpm
                         exited = nodeNpm.WaitForExit(this.Timeout);
                         if (!exited)
                         {
+                            NpmSync.RemNpmSync(sync);
                             nodeNpm.Kill();
                             throw new NpmException(WaitTimeout);
                         }
@@ -289,27 +301,18 @@ namespace NodeNpm
                 }
                 catch (Win32Exception ex)
                 {
-                    NpmSync.RemNpmSync(nodeNpm);
+                    NpmSync.RemNpmSync(sync);
                     throw new NpmException(WaitWin32Exception, ex);
                 }
                 catch (SystemException ex)
                 {
-                    NpmSync.RemNpmSync(nodeNpm);
+                    NpmSync.RemNpmSync(sync);
                     throw new NpmException(WaitSystemException, ex);
                 }
 
-                NpmSync sync = NpmSync.FindNpmSync(nodeNpm);
-                NpmSync.RemNpmSync(nodeNpm);
-                if (sync != null)
-                {
-                    this.lastExecuteOutput = sync.GetOutput();
-                    this.lastExecuteErrorText = sync.GetError();
-                }
-                else
-                {
-                    this.lastExecuteOutput = string.Empty;
-                    this.lastExecuteErrorText = string.Empty;
-                }
+                this.lastExecuteOutput = sync.GetOutput();
+                this.lastExecuteErrorText = sync.GetError();
+                NpmSync.RemNpmSync(sync);
 
                 return nodeNpm.ExitCode;
             }
@@ -353,6 +356,20 @@ namespace NodeNpm
                     sync.AddToOuput(outLine.Data);
                 }
             }
+        }
+
+        /// <summary>
+        /// Initializes NpmClient.
+        /// Accepts the current project directory.
+        /// </summary>
+        /// <param name="wd">project directory</param>
+        private void Initialize(string wd)
+        {
+            this.WorkingDirectory = wd;
+            this.Timeout = 0;
+            this.InstallPath = Environment.ExpandEnvironmentVariables(DefInstallPath);
+            this.NpmRelativePath = DefNpmRelativePath;
+            this.Registry = null;
         }
     }
 }

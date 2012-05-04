@@ -31,9 +31,9 @@ namespace NodeNpm
         string WorkingDirectory { get; set; }
 
         /// <summary>
-        /// Gets or sets URL of remote registry. Only set if not using default NPM.
+        /// Gets or sets URI of remote registry. Only set if not using default NPM.
         /// </summary>
-        string Registry { get; set; }
+        Uri Registry { get; set; }
 
         /// <summary>
         /// Gets or sets HTTP Proxy URL

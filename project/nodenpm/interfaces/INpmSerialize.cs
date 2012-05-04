@@ -24,6 +24,13 @@ namespace NodeNpm
         IEnumerable<INpmInstalledPackage> FromListInstalled(string listJson);
 
         /// <summary>
+        /// converts npm list output to NpmInstalledPackage enumeration of immediate children
+        /// </summary>
+        /// <param name="listJson">text output</param>
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        IEnumerable<INpmInstalledPackage> FromListInstalledChildren(string listJson);
+
+        /// <summary>
         /// parse npm list output for matching NpmInstalledPackage
         /// </summary>
         /// <param name="listJson">text output</param>

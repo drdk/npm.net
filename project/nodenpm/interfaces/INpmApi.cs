@@ -50,6 +50,12 @@ namespace NodeNpm
         IEnumerable<INpmInstalledPackage> List();
 
         /// <summary>
+        /// Get installed child modules in project. Wraps 'npm list'
+        /// </summary>
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        IEnumerable<INpmInstalledPackage> ListChildren();
+
+        /// <summary>
         /// Get properties of package in repository. Wraps 'npm view name'
         /// </summary>
         /// <param name="name">package name</param>
@@ -82,6 +88,13 @@ namespace NodeNpm
         /// <param name="name">name of package</param>
         /// <returns>enumerable set of packages needing updates</returns>
         IEnumerable<INpmPackageDependency> Outdated(string name);
+
+        /// <summary>
+        /// Check if dependencies are outdated. Wraps 'npm outdated name name2'
+        /// </summary>
+        /// <param name="packages">set of packages to test</param>
+        /// <returns>enumerable set of packages needing updates</returns>
+        IEnumerable<INpmPackageDependency> Outdated(IEnumerable<INpmPackage> packages);
 
         /// <summary>
         /// Update named package. Wraps 'npm update name'

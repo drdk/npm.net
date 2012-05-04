@@ -78,7 +78,7 @@ namespace NpmUnitTests
         public void NpmApiConstructorTest()
         {
             string wd = string.Empty;
-            string registry = string.Empty;
+            Uri registry = null;
             NpmApi target = new NpmApi(wd, registry);
             Assert.IsNotNull(target);
             Assert.IsInstanceOfType(target, typeof(NpmApi));
@@ -91,7 +91,7 @@ namespace NpmUnitTests
         public void GetInstalledVersionTest()
         {
             string wd = string.Empty;
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string expected = MockTestData.Version1Expected();
@@ -107,7 +107,7 @@ namespace NpmUnitTests
         public void InstallTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             NpmPackage package = new NpmPackage("install1", null);
@@ -131,12 +131,35 @@ namespace NpmUnitTests
         public void ListTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             List<NpmInstalledPackage> expected = MockTestData.List1Expected();
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.List();
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for ListChildren
+        /// </summary>
+        [TestMethod]
+        public void ListChildrenTest()
+        {
+            string wd = "c:\\root\\project1";
+            Uri registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmApi target = new NpmApi(factory, wd, registry);
+            List<NpmInstalledPackage> expected = MockTestData.List1ChildrenExpected();
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.ListChildren();
             Assert.IsNotNull(actual);
             Assert.AreEqual(expected.Count, actual.Count());
             int index = 0;
@@ -154,7 +177,7 @@ namespace NpmUnitTests
         public void ListEmptyTest()
         {
             string wd = "c:\\root\\empty1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             List<NpmInstalledPackage> expected = MockTestData.ListEmptyExpected();
@@ -177,7 +200,7 @@ namespace NpmUnitTests
         public void OutdatedTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string name = "outdated1";
@@ -201,7 +224,7 @@ namespace NpmUnitTests
         public void OutdatedTest1()
         {
             string wd = "c:\\root\\project1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
@@ -224,7 +247,7 @@ namespace NpmUnitTests
         public void SearchTest()
         {
             string wd = string.Empty;
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string searchTerms = "search1";
@@ -248,7 +271,7 @@ namespace NpmUnitTests
         public void UninstallTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string name = "uninstall1";
@@ -265,7 +288,7 @@ namespace NpmUnitTests
         public void UpdateTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string name = "underscore";
@@ -288,7 +311,7 @@ namespace NpmUnitTests
         public void ViewTest()
         {
             string wd = string.Empty;
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             string name = "view1";
@@ -305,7 +328,7 @@ namespace NpmUnitTests
         public void TestInstalledTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             NpmPackage package = MockTestData.List1MatchInstalledPackage();
@@ -330,7 +353,7 @@ namespace NpmUnitTests
         public void InstallFailsTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = string.Empty;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmApi target = new NpmApi(factory, wd, registry);
             NpmPackage package = new NpmPackage("bogusmod", null);

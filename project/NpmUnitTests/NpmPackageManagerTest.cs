@@ -79,7 +79,7 @@ namespace NpmUnitTests
         {
             NpmFactory factory = new MockNpmFactory();
             string wd = string.Empty;
-            string registry = null;
+            Uri registry = null;
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             Assert.IsNotNull(target);
             Assert.IsInstanceOfType(target, typeof(NpmPackageManager));
@@ -92,7 +92,7 @@ namespace NpmUnitTests
         public void NpmPackageManagerConstructorTest1()
         {
             string wd = string.Empty;
-            string registry = string.Empty;
+            Uri registry = null;
             NpmPackageManager target = new NpmPackageManager(wd, registry);
             Assert.IsNotNull(target);
             Assert.IsInstanceOfType(target, typeof(NpmPackageManager));
@@ -117,7 +117,7 @@ namespace NpmUnitTests
         public void FindDependenciesToBeInstalledTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = new NpmPackage("outdated1", null);
@@ -141,7 +141,7 @@ namespace NpmUnitTests
         public void FindDependenciesToBeInstalledEmptyTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = new NpmPackage("outdated1", null);
@@ -165,7 +165,7 @@ namespace NpmUnitTests
         public void FindDependenciesToBeInstalledMultiTest()
         {
             string wd = "c:\\root\\outdatedmulti";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = new NpmPackage("outdatedparent", null);
@@ -189,7 +189,7 @@ namespace NpmUnitTests
         public void FindPackagesTest()
         {
             string wd = string.Empty;
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             List<string> packageIds = new List<string>();
@@ -215,10 +215,10 @@ namespace NpmUnitTests
         public void GetInstalledPackagesTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
-            List<NpmInstalledPackage> expected = MockTestData.List1Expected();
+            List<NpmInstalledPackage> expected = MockTestData.List1ChildrenExpected();
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.GetInstalledPackages();
             Assert.IsNotNull(actual);
@@ -238,7 +238,7 @@ namespace NpmUnitTests
         public void GetInstalledPackagesEmptyTest()
         {
             string wd = "c:\\root\\empty1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             List<NpmInstalledPackage> expected = MockTestData.ListEmptyExpected();
@@ -260,8 +260,8 @@ namespace NpmUnitTests
         [TestMethod]
         public void GetPackagesWithUpdatesTest()
         {
-            string wd = "c:\\root\\project1";
-            string registry = null;
+            string wd = "c:\\root\\update1";
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
@@ -284,7 +284,7 @@ namespace NpmUnitTests
         public void GetRemotePackagesTest()
         {
             string wd = string.Empty;
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             string searchTerms = null;
@@ -308,21 +308,12 @@ namespace NpmUnitTests
         public void InstallPackageTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = new NpmPackage("install1", null);
-            List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
-            IEnumerable<INpmInstalledPackage> actual;
-            actual = target.InstallPackage(package);
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Count, actual.Count());
-            int index = 0;
-            foreach (INpmInstalledPackage actualItem in actual)
-            {
-                Assert.AreEqual(expected[index], actualItem, "item value differs");
-                index++;
-            }
+            target.InstallPackage(package);
+            Assert.IsTrue(true);   // no exception thrown
         }
 
         /// <summary>
@@ -332,7 +323,7 @@ namespace NpmUnitTests
         public void IsPackageInstalledTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = MockTestData.List1MatchInstalledPackage();
@@ -357,7 +348,7 @@ namespace NpmUnitTests
         public void SearchRemotePackagesTest()
         {
             string wd = string.Empty;
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             string searchTerms = "search1";
@@ -381,26 +372,12 @@ namespace NpmUnitTests
         public void UninstallPackageTest()
         {
             string wd = "c:\\root\\uninstall1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             INpmPackage package = new NpmPackage("uninstall1", null);
-            List<string> expected = MockTestData.Uninstall1Expected();
-            IEnumerable<string> actual;
-            actual = target.UninstallPackage(package);
-            if (expected == null)
-            {
-                Assert.AreEqual(expected, actual);
-            }
-            else
-            {
-                Assert.IsNotNull(actual);
-                Assert.AreEqual(expected.Count, actual.Count());
-                foreach (string result in actual)
-                {
-                    Assert.IsTrue(expected.Contains(result), "Uninstall result value differs");
-                }
-            }
+            target.UninstallPackage(package);
+            Assert.IsTrue(true);    // no exception thrown
         }
 
         /// <summary>
@@ -410,26 +387,12 @@ namespace NpmUnitTests
         public void UpdatePackageTest()
         {
             string wd = "c:\\root\\update1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = new NpmPackage("underscore", null);
-            List<string> expected = MockTestData.Install1ExpectedNames();
-            IEnumerable<string> actual;
-            actual = target.UpdatePackage(package);
-            if (expected == null)
-            {
-                Assert.AreEqual(expected, actual);
-            }
-            else
-            {
-                Assert.IsNotNull(actual);
-                Assert.AreEqual(expected.Count, actual.Count());
-                foreach (string result in actual)
-                {
-                    Assert.IsTrue(expected.Contains(result), "Update result value differs");
-                }
-            }
+            target.UpdatePackage(package);
+            Assert.IsTrue(true);    // no exception thrown
         }
 
         /// <summary>
@@ -454,16 +417,15 @@ namespace NpmUnitTests
         public void InstallPackageFailureTest()
         {
             string wd = "c:\\root\\project1";
-            string registry = null;
+            Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
             NpmPackage package = new NpmPackage("bogusmod", null);
             NpmException expected = MockTestData.ErrorInstallExpected();
             try
             {
-            IEnumerable<INpmInstalledPackage> actual;
-            actual = target.InstallPackage(package);
-            Assert.Fail("Expected exception");
+                target.InstallPackage(package);
+                Assert.Fail("Expected exception");
             }
             catch (NpmException ex)
             {

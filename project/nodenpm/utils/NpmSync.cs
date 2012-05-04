@@ -76,7 +76,8 @@ namespace NodeNpm
         /// Create new NpmSync and associate it with this Porcess object
         /// </summary>
         /// <param name="obj">Process object</param>
-        internal static void AddNpmSync(Process obj)
+        /// <returns>NpmSync to track this request</returns>
+        internal static NpmSync AddNpmSync(Process obj)
         {
             if (runningNpms == null)
             {
@@ -85,6 +86,19 @@ namespace NodeNpm
 
             NpmSync sync = new NpmSync(obj);
             runningNpms.Add(sync);
+            return sync;
+        }
+
+        /// <summary>
+        /// Remove the NpmSync object
+        /// </summary>
+        /// <param name="sync">sync object</param>
+        internal static void RemNpmSync(NpmSync sync)
+        {
+            if (sync != null)
+            {
+                runningNpms.Remove(sync);
+            }
         }
 
         /// <summary>

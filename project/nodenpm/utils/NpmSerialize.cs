@@ -70,6 +70,26 @@ namespace NodeNpm
         private const string NpmErrorLineStart = "npm ERR! ";
 
         /// <summary>
+        /// Regular expression for parsing search output
+        /// </summary>
+        private const string SearchPattern = @"^(\S+)\s+(.*)=(\S+)\s+([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2})\s*(.*)$";
+
+        /// <summary>
+        /// Regular expression for combined json strings
+        /// </summary>
+        private const string ConcatJsonPattern = @"\r\n}\s*{";
+
+        /// <summary>
+        /// Regular expression class for parsing search output
+        /// </summary>
+        private static Regex searchRegex = null;
+
+        /// <summary>
+        /// Regular expression class for parsing search output
+        /// </summary>
+        private static Regex concatJsonRegex = null;
+
+        /// <summary>
         /// Build path for specified dependency
         /// </summary>
         /// <param name="depends">dependency name</param>
@@ -159,6 +179,47 @@ namespace NodeNpm
                     object name = string.Empty;
                     listObj.TryGetValue("name", out name);
                     this.InstalledPackageFromDictionary(installed, name as string, string.Empty, listObj);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new NpmException(ConvertErrorList, ex);
+            }
+
+            return installed;
+        }
+
+        /// <summary>
+        /// converts npm list output to NpmInstalledPackage enumeration of immediate children
+        /// </summary>
+        /// <param name="listJson">text output</param>
+        /// <returns>enumerable NpmInstalledPackage properties</returns>
+        public IEnumerable<INpmInstalledPackage> FromListInstalledChildren(string listJson)
+        {
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            List<INpmInstalledPackage> installed = new List<INpmInstalledPackage>();
+            Dictionary<string, object> listObj = null;
+
+            try
+            {
+                listObj = serializer.Deserialize<Dictionary<string, object>>(listJson);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new NpmException(ParseErrorList, ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new NpmException(ParseErrorList, ex);
+            }
+
+            try
+            {
+                if (listObj != null && listObj.Count > 0)
+                {
+                    object name = string.Empty;
+                    listObj.TryGetValue("name", out name);
+                    this.InstalledDependenciesFromDictionary(installed, name as string, listObj);
                 }
             }
             catch (Exception ex)
@@ -317,8 +378,11 @@ namespace NodeNpm
 
             string[] lines = output.Split('\n');
             int count = lines.Length;
-            string pat = @"^(\S+)\s+(.*)=(\S+)\s+([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2})\s*(.*)$";
-            Regex r = new Regex(pat);
+
+            if (searchRegex == null)
+            {
+                searchRegex = new Regex(SearchPattern, RegexOptions.Compiled);
+            }
 
             // skip first line - header
             for (int ix = 1; ix < count; ix++)
@@ -331,7 +395,7 @@ namespace NodeNpm
                 DateTime dateParsed = DateTime.Now;
                 string[] keywords = null;
 
-                Match m = r.Match(lines[ix]);
+                Match m = searchRegex.Match(lines[ix]);
                 if (m.Success && m.Groups.Count > 1)
                 {
                     name = m.Groups[1].ToString();
@@ -384,32 +448,57 @@ namespace NodeNpm
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             List<INpmInstalledPackage> installs = new List<INpmInstalledPackage>();
             Dictionary<string, object> installObj = null;
-            try
+
+            if (concatJsonRegex == null)
             {
-                installObj = serializer.Deserialize<Dictionary<string, object>>(output);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new NpmException(ParseErrorInstall, ex);
-            }
-            catch (ArgumentException ex)
-            {
-                throw new NpmException(ParseErrorInstall, ex);
+                concatJsonRegex = new Regex(ConcatJsonPattern, RegexOptions.Compiled);
             }
 
-            try
+            // In case we get multiple Json object returned, split into multiple strings
+            MatchCollection matches = concatJsonRegex.Matches(output);
+            string[] jsonStrings = new string[matches.Count + 1];
+
+            int startIndex = 0;
+            int stringNum = 0;
+            foreach (Match match in matches)
             {
-                if (installObj != null && installObj.Count > 0)
+                int nextIndex = match.Index + 3;
+                jsonStrings[stringNum] = output.Substring(startIndex, nextIndex - startIndex);
+                startIndex = nextIndex;
+                stringNum++;
+            }
+
+            jsonStrings[stringNum] = output.Substring(startIndex);
+
+            foreach (string jsonString in jsonStrings)
+            {
+                try
                 {
-                    foreach (KeyValuePair<string, object> module in installObj)
+                    installObj = serializer.Deserialize<Dictionary<string, object>>(jsonString);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new NpmException(ParseErrorInstall, ex);
+                }
+                catch (ArgumentException ex)
+                {
+                    throw new NpmException(ParseErrorInstall, ex);
+                }
+
+                try
+                {
+                    if (installObj != null && installObj.Count > 0)
                     {
-                        NpmSerialize.InstalledPackagesFromInstalledDictionary(installs, module.Value);
+                        foreach (KeyValuePair<string, object> module in installObj)
+                        {
+                            NpmSerialize.InstalledPackagesFromInstalledDictionary(installs, module.Value);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new NpmException(ConvertErrorInstall, ex);
+                catch (Exception ex)
+                {
+                    throw new NpmException(ConvertErrorInstall, ex);
+                }
             }
 
             return installs;
@@ -769,6 +858,63 @@ namespace NodeNpm
                         if (val != null)
                         {
                             this.InstalledPackageFromDictionary(parent, pair.Key, mypath, val);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deserialize the parsed json results to a package for immediate children only
+        /// </summary>
+        /// <param name="parent">Parent list for this object</param>
+        /// <param name="dependentPath">list of parents delimited by "/"</param>
+        /// <param name="listObj">dictionary at root of package</param>
+        private void InstalledDependenciesFromDictionary(
+                                                    List<INpmInstalledPackage> parent,
+                                                    string dependentPath,
+                                                    Dictionary<string, object> listObj)
+        {
+            if (listObj.ContainsKey("dependencies"))
+            {
+                IDictionary<string, object> dependDict = null;
+                object dependecyObj;
+                if (listObj.TryGetValue("dependencies", out dependecyObj))
+                {
+                    dependDict = dependecyObj as IDictionary<string, object>;
+                }
+
+                if (dependDict != null && dependDict.Count > 0)
+                {
+                    foreach (KeyValuePair<string, object> pair in dependDict)
+                    {
+                        Dictionary<string, object> val = pair.Value as Dictionary<string, object>;
+                        if (val != null)
+                        {
+                            NpmInstalledPackage installed = new NpmInstalledPackage();
+                            installed.Name = pair.Key;
+                            installed.DependentPath = dependentPath;
+                            if (val.ContainsKey("version"))
+                            {
+                                installed.Version = val["version"] as string;
+                            }
+
+                            if (val.ContainsKey("missing"))
+                            {
+                                installed.IsMissing = true;
+                            }
+
+                            if (val.ContainsKey("invalid"))
+                            {
+                                installed.IsOutdated = true;
+                            }
+
+                            if (val.ContainsKey("dependencies"))
+                            {
+                                installed.HasDependencies = true;
+                            }
+
+                            parent.Add(installed);
                         }
                     }
                 }

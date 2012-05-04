@@ -51,8 +51,7 @@ namespace NodeNpm
         /// Install sepcified package
         /// </summary>
         /// <param name="package">name and optional version to be installed</param>
-        /// <returns>enumerable INpmPackage set of all installed packages</returns>
-        IEnumerable<INpmInstalledPackage> InstallPackage(INpmPackage package);
+        void InstallPackage(INpmPackage package);
 
         /// <summary>
         /// Test if the package is installed in current project
@@ -72,14 +71,12 @@ namespace NodeNpm
         /// Uninstall specified package from current project
         /// </summary>
         /// <param name="package">name of package</param>
-        /// <returns>enumerable string set of packages removed</returns>
-        IEnumerable<string> UninstallPackage(INpmPackage package);
+        void UninstallPackage(INpmPackage package);
 
         /// <summary>
         /// Update specified package in current directory
         /// </summary>
         /// <param name="package">name and optional version</param>
-        /// <returns>enumerable string set of packages updated</returns>
-        IEnumerable<string> UpdatePackage(INpmPackage package);
+        void UpdatePackage(INpmPackage package);
     }
 }

@@ -142,6 +142,41 @@ namespace NpmUnitTests
         }
 
         /// <summary>
+        /// Expected output from list
+        /// </summary>
+        /// <returns>Expected result for list test</returns>
+        public static List<NpmInstalledPackage> List1ChildrenExpected()
+        {
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            NpmInstalledPackage package;
+            package = new NpmInstalledPackage();
+            package.Name = "xml2js";
+            package.Version = "0.1.13";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "sax";
+            package.Version = "0.4.0";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = false;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "jshint";
+            package.Version = "0.5.9";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = true;
+            package.DependentPath = "azure";
+            expected.Add(package);
+            return expected;
+        }
+
+        /// <summary>
         /// Input for IsInstalled test
         /// </summary>
         /// <returns>Input data for IsInstalled test</returns>

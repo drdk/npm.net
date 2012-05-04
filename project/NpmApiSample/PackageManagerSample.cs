@@ -29,8 +29,6 @@ namespace NpmApiSample
         {
             try
             {
-                IEnumerable<string> uninstalled = null;
-
                 NpmPackageManager npm = new NpmPackageManager(wd);
                 if (npm == null)
                 {
@@ -60,12 +58,7 @@ namespace NpmApiSample
                 }
 
                 // install module as a dependency
-                IEnumerable<INpmPackage> installed = npm.InstallPackage(found);
-                if (installed == null || installed.Count() == 0)
-                {
-                    Console.WriteLine("InstallPackage failed for {0}", found.Name);
-                    return false;
-                }
+                npm.InstallPackage(found);
 
                 // list packages at parent
                 IEnumerable<INpmInstalledPackage> installedPkg = npm.GetInstalledPackages();
@@ -82,72 +75,10 @@ namespace NpmApiSample
                     return false;
                 }
 
-                // remove a dependency
-                foreach (INpmInstalledPackage package in installedPkg)
-                {
-                    if (package.DependentPath == found.Name)
-                    {
-                        uninstalled = npm.UninstallPackage(package);
-                        if (uninstalled == null)
-                        {
-                            Console.WriteLine("Failed to uninstall dependency {0} of {1}", package.Name, found.Name);
-                            return false;
-                        }
+                // now call update
+                npm.UpdatePackage(found);
 
-                        // Make sure IsPackageInstalled returns null
-                        INpmInstalledPackage missingPackage = npm.IsPackageInstalled(package);
-                        if (missingPackage != null)
-                        {
-                            Console.WriteLine("Test for installed after uninstall fails for {0} of {1}", package.Name, found.Name);
-                            return false;
-                        }
-
-                        break;
-                    }
-                }
-
-                // check if dependency reported as missing
-                IEnumerable<INpmPackageDependency> outdated = npm.FindDependenciesToBeInstalled(found);
-                if (uninstalled != null)
-                {
-                    if (outdated != null && outdated.Count() > 0)
-                    {
-                        foreach (string uninstalledName in uninstalled)
-                        {
-                            bool matchMissing = false;
-                            foreach (INpmPackageDependency outofdate in outdated)
-                            {
-                                if (outofdate.Name == uninstalledName &&
-                                    string.IsNullOrWhiteSpace(outofdate.Version))
-                                {
-                                    matchMissing = true;
-                                    break;
-                                }
-                            }
-
-                            if (!matchMissing)
-                            {
-                                Console.WriteLine("Test for outdated after uninstall fails for {0} of {1}", uninstalledName, found.Name);
-                                return false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Test for outdated after uninstall fails for {0}", found.Name);
-                        return false;
-                    }
-                }
-
-                // now call update and check if it is fixed
-                IEnumerable<string> updated = npm.UpdatePackage(found);
-                if (updated == null)
-                {
-                    Console.WriteLine("Update failed for {0}", found.Name);
-                    return false;
-                }
-
-                outdated = npm.FindDependenciesToBeInstalled(found);
+                IEnumerable<INpmPackageDependency>  outdated = npm.FindDependenciesToBeInstalled(found);
                 if (outdated != null && outdated.Count() > 0)
                 {
                     Console.WriteLine("Expected no outdated entry after update of {0}", module);
