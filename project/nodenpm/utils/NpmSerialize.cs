@@ -105,10 +105,10 @@ namespace NodeNpm
             string[] dependencies = depends.Split(seps);
             string relative = ".";
 
-            // keep adding module path to root
-            foreach (string depend in dependencies)
+            // skip first part & keep adding module path to root
+            for (int i = 1; i < dependencies.Length; i++)
             {
-                relative = Path.Combine(relative, ModuleDir, depend);
+                relative = Path.Combine(relative, ModuleDir, dependencies[i]);
             }
 
             return relative;
@@ -132,16 +132,13 @@ namespace NodeNpm
 
             foreach (string module in modules)
             {
-                if (module != ".")
+                if (string.IsNullOrWhiteSpace(depends))
                 {
-                    if (string.IsNullOrWhiteSpace(depends))
-                    {
-                        depends = module;
-                    }
-                    else
-                    {
-                        depends = depends + "/" + module;
-                    }
+                    depends = module;
+                }
+                else
+                {
+                    depends = depends + "/" + module;
                 }
             }
 
@@ -217,8 +214,13 @@ namespace NodeNpm
             {
                 if (listObj != null && listObj.Count > 0)
                 {
-                    object name = string.Empty;
+                    object name;
                     listObj.TryGetValue("name", out name);
+                    if (name == null)
+                    {
+                        name = ".";
+                    }
+
                     this.InstalledDependenciesFromDictionary(installed, name as string, listObj);
                 }
             }
@@ -814,44 +816,49 @@ namespace NodeNpm
                                                     Dictionary<string, object> listObj)
         {
             NpmInstalledPackage installed = new NpmInstalledPackage();
-            installed.Name = name;
-            installed.DependentPath = dependentPath;
-            if (listObj.ContainsKey("version"))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                installed.Version = listObj["version"] as string;
-            }
+                // if node has no name, then do not add it.
+                installed.Name = name;
+                installed.DependentPath = dependentPath;
+                if (listObj.ContainsKey("version"))
+                {
+                    installed.Version = listObj["version"] as string;
+                }
 
-            if (listObj.ContainsKey("missing"))
-            {
-                installed.IsMissing = true;
-            }
+                if (listObj.ContainsKey("missing"))
+                {
+                    installed.IsMissing = true;
+                }
 
-            if (listObj.ContainsKey("invalid"))
-            {
-                installed.IsOutdated = true;
-            }
+                if (listObj.ContainsKey("invalid"))
+                {
+                    installed.IsOutdated = true;
+                }
 
-            if (listObj.ContainsKey("dependencies"))
-            {
-                installed.HasDependencies = true;
-            }
+                if (listObj.ContainsKey("dependencies"))
+                {
+                    installed.HasDependencies = true;
+                }
 
-            parent.Add(installed);
+                parent.Add(installed);
+            }
 
             if (listObj.ContainsKey("dependencies"))
             {
                 IDictionary<string, object> dependDict = null;
-                object dependecyObj;
-                if (listObj.TryGetValue("dependencies", out dependecyObj))
+                object dependencyObj;
+                if (listObj.TryGetValue("dependencies", out dependencyObj))
                 {
-                    dependDict = dependecyObj as IDictionary<string, object>;
+                    dependDict = dependencyObj as IDictionary<string, object>;
                 }
 
                 if (dependDict != null && dependDict.Count > 0)
                 {
-                    string mypath = string.IsNullOrWhiteSpace(dependentPath) ? 
-                                                        installed.Name :
-                                                        dependentPath + "/" + installed.Name;
+                    string parentName = string.IsNullOrWhiteSpace(name) ? "." : name;
+                    string mypath = string.IsNullOrWhiteSpace(dependentPath) ?
+                                                        parentName :
+                                                        dependentPath + "/" + parentName;
                     foreach (KeyValuePair<string, object> pair in dependDict)
                     {
                         Dictionary<string, object> val = pair.Value as Dictionary<string, object>;
@@ -878,10 +885,10 @@ namespace NodeNpm
             if (listObj.ContainsKey("dependencies"))
             {
                 IDictionary<string, object> dependDict = null;
-                object dependecyObj;
-                if (listObj.TryGetValue("dependencies", out dependecyObj))
+                object dependencyObj;
+                if (listObj.TryGetValue("dependencies", out dependencyObj))
                 {
-                    dependDict = dependecyObj as IDictionary<string, object>;
+                    dependDict = dependencyObj as IDictionary<string, object>;
                 }
 
                 if (dependDict != null && dependDict.Count > 0)
@@ -964,10 +971,10 @@ namespace NodeNpm
             if (listObj.ContainsKey("dependencies"))
             {
                 IDictionary<string, object> dependDict = null;
-                object dependecyObj;
-                if (listObj.TryGetValue("dependencies", out dependecyObj))
+                object dependencyObj;
+                if (listObj.TryGetValue("dependencies", out dependencyObj))
                 {
-                    dependDict = dependecyObj as IDictionary<string, object>;
+                    dependDict = dependencyObj as IDictionary<string, object>;
                 }
 
                 if (dependDict != null && dependDict.Count > 0)

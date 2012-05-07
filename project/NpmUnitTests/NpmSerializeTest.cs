@@ -131,7 +131,30 @@ namespace NpmUnitTests
         /// A test for FromListInstalled
         /// </summary>
         [TestMethod]
-        public void FromListInstalledTest2()
+        public void FromListInstalled2Test()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.List2Text();
+            List<NpmInstalledPackage> expected = MockTestData.List2Expected();
+
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.FromListInstalled(jsonlist);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for FromListInstalled
+        /// </summary>
+        [TestMethod]
+        public void FromListInstalledProblemTest()
         {
             NpmSerialize target = new NpmSerialize();
 
@@ -210,6 +233,29 @@ namespace NpmUnitTests
 
             string jsonlist = MockTestData.List1Text();
             List<NpmInstalledPackage> expected = MockTestData.List1ChildrenExpected();
+
+            IEnumerable<INpmInstalledPackage> actual;
+            actual = target.FromListInstalledChildren(jsonlist);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
+        /// A test for FromListInstalledChildren
+        /// </summary>
+        [TestMethod]
+        public void FromListInstalledChildren2Test()
+        {
+            NpmSerialize target = new NpmSerialize();
+
+            string jsonlist = MockTestData.List2Text();
+            List<NpmInstalledPackage> expected = MockTestData.List2ChildrenExpected();
 
             IEnumerable<INpmInstalledPackage> actual;
             actual = target.FromListInstalledChildren(jsonlist);

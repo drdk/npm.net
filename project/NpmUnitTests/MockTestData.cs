@@ -91,6 +91,39 @@ namespace NpmUnitTests
         }
 
         /// <summary>
+        /// Expected input for list
+        /// </summary>
+        /// <returns>Predictable output text for list test</returns>
+        /// <remarks>root directory not a package</remarks>
+        public static string List2Text()
+        {
+            return
+                    "{\n" +
+                    "  \"dependencies\": {\n" +
+                    "    \"azure\": {\n" +
+                    "      \"version\": \"0.5.2\",\n" +
+                    "      \"dependencies\": {\n" +
+                    "        \"xml2js\": {\n" +
+                    "          \"version\": \"0.1.13\"\n" +
+                    "        },\n" +
+                    "        \"sax\": {\n" +
+                    "          \"version\": \"0.4.0\"\n" +
+                    "        },\n" +
+                    "        \"jshint\": {\n" +
+                    "          \"version\": \"0.5.9\",\n" +
+                    "          \"dependencies\": {\n" +
+                    "            \"argsparser\": {\n" +
+                    "              \"version\": \"0.0.6\"\n" +
+                    "            }\n" +
+                    "          }\n" +
+                    "        }\n" +
+                    "      }\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+        }
+
+        /// <summary>
         /// Expected output from list
         /// </summary>
         /// <returns>Expected result for list test</returns>
@@ -145,6 +178,57 @@ namespace NpmUnitTests
         /// Expected output from list
         /// </summary>
         /// <returns>Expected result for list test</returns>
+        public static List<NpmInstalledPackage> List2Expected()
+        {
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            NpmInstalledPackage package;
+            package = new NpmInstalledPackage();
+            package.Name = "azure";
+            package.Version = "0.5.2";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = true;
+            package.DependentPath = ".";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "xml2js";
+            package.Version = "0.1.13";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = false;
+            package.DependentPath = "./azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "sax";
+            package.Version = "0.4.0";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = false;
+            package.DependentPath = "./azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "jshint";
+            package.Version = "0.5.9";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = true;
+            package.DependentPath = "./azure";
+            expected.Add(package);
+            package = new NpmInstalledPackage();
+            package.Name = "argsparser";
+            package.Version = "0.0.6";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = false;
+            package.DependentPath = "./azure/jshint";
+            expected.Add(package);
+            return expected;
+        }
+
+        /// <summary>
+        /// Expected output from list
+        /// </summary>
+        /// <returns>Expected result for list test</returns>
         public static List<NpmInstalledPackage> List1ChildrenExpected()
         {
             List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
@@ -172,6 +256,25 @@ namespace NpmUnitTests
             package.IsOutdated = false;
             package.HasDependencies = true;
             package.DependentPath = "azure";
+            expected.Add(package);
+            return expected;
+        }
+
+        /// <summary>
+        /// Expected output from list
+        /// </summary>
+        /// <returns>Expected result for list test</returns>
+        public static List<NpmInstalledPackage> List2ChildrenExpected()
+        {
+            List<NpmInstalledPackage> expected = new List<NpmInstalledPackage>();
+            NpmInstalledPackage package;
+            package = new NpmInstalledPackage();
+            package.Name = "azure";
+            package.Version = "0.5.2";
+            package.IsMissing = false;
+            package.IsOutdated = false;
+            package.HasDependencies = true;
+            package.DependentPath = ".";
             expected.Add(package);
             return expected;
         }
@@ -591,18 +694,23 @@ namespace NpmUnitTests
         {
             return
                     "{\n" +
-                    "  \"name\": \"outdatedparent\",\n" +
+                    "  \"name\": \"root\",\n" +
                     "  \"version\": \"0.5.2\",\n" +
                     "  \"dependencies\": {\n" +
-                    "    \"current\": {\n" +
-                    "      \"version\": \"0.1.13\"\n" +
-                    "    },\n" +
-                    "    \"outdatedchild\": {\n" +
-                    "      \"version\": \"1.3.0\",\n" +
-                    "      \"invalid\": true,\n" +
-                    "      \"problems\": [\n" +
-                    "        \"invalid: outdatedchild@1.3.0 C:\\\\mock\\\\mockdata\\\\node_modules\\\\outdatedchild\"\n" +
-                    "      ]\n" +
+                    "    \"outdatedparent\": {\n" +
+                    "      \"version\": \"0.5.2\",\n" +
+                    "      \"dependencies\": {\n" +
+                    "        \"current\": {\n" +
+                    "          \"version\": \"0.1.13\"\n" +
+                    "        },\n" +
+                    "        \"outdatedchild\": {\n" +
+                    "          \"version\": \"1.3.0\",\n" +
+                    "          \"invalid\": true,\n" +
+                    "          \"problems\": [\n" +
+                    "            \"invalid: outdatedchild@1.3.0 C:\\\\mock\\\\mockdata\\\\node_modules\\\\outdatedchild\"\n" +
+                    "          ]\n" +
+                    "        }\n" +
+                    "      }\n" +
                     "    }\n" +
                     "  }\n" +
                     "}";

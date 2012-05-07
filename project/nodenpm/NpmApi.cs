@@ -94,7 +94,7 @@ namespace NodeNpm
             }
             else
             {
-                string path = this.ConvertDependToPath(dependency);
+                string path = this.ConvertDependToPath("./" + dependency);
                 this.Client.WorkingDirectory = path;
             }
         }

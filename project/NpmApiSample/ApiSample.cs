@@ -83,28 +83,28 @@ namespace NpmApiSample
                     return false;
                 }
 
-                // remove a dependency
-                foreach (INpmInstalledPackage package in installedPkg)
-                {
-                    if (package.DependentPath == found.Name)
-                    {
-                        // switch to dependency directory to uninstall
-                        npm.SetDependencyDirectory(found.Name);
-                        if (!npm.Uninstall(package.Name))
-                        {
-                            Console.WriteLine("Failed to uninstall dependency {0} of {1}", package.Name, found.Name);
-                            return false;
-                        }
-                        else
-                        {
-                            uninstalledName = package.Name;
-                        }
+                // switch to dependency directory to uninstall a child
+                npm.SetDependencyDirectory(found.Name);
 
-                        // revert directory
-                        npm.SetDependencyDirectory(null);
-                        break;
+                // remove a dependency
+                IEnumerable<INpmInstalledPackage> installedChildren = npm.ListChildren();
+                foreach (INpmInstalledPackage package in installedChildren)
+                {
+                    if (!npm.Uninstall(package.Name))
+                    {
+                        Console.WriteLine("Failed to uninstall dependency {0} of {1}", package.Name, found.Name);
+                        return false;
                     }
+                    else
+                    {
+                        uninstalledName = package.Name;
+                    }
+
+                    break;
                 }
+
+                // revert directory
+                npm.SetDependencyDirectory(null);
 
                 // check that it is reported as missing
                 bool matchMissing = false;

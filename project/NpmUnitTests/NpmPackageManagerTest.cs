@@ -140,7 +140,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FindDependenciesToBeInstalledEmptyTest()
         {
-            string wd = "c:\\root\\project1";
+            string wd = "c:\\root\\outdatedmulti";
             Uri registry = null;
             NpmFactory factory = new MockNpmFactory();
             NpmPackageManager target = new NpmPackageManager(factory, wd, registry);

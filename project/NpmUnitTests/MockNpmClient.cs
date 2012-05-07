@@ -180,6 +180,11 @@ namespace NpmUnitTests
                 this.lastExecuteOutput = MockTestData.List1Text();
                 return 0;
             }
+            if (wd.IndexOf("project2") > 0)
+            {
+                this.lastExecuteOutput = MockTestData.List2Text();
+                return 0;
+            }
             else if (wd.IndexOf("uninstall1") > 0)
             {
                 if (this.calledUninstall)
@@ -276,6 +281,11 @@ namespace NpmUnitTests
                 else if (args.StartsWith("outdatedparent", StringComparison.InvariantCultureIgnoreCase))
                 {
                     this.lastExecuteOutput = MockTestData.OutdatedParentText();
+                    return 0;
+                }
+                else if (args.StartsWith("outdated1", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    this.lastExecuteOutput = MockTestData.Outdated1Text();
                     return 0;
                 }
             }

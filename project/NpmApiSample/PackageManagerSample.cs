@@ -78,14 +78,16 @@ namespace NpmApiSample
                 // now call update
                 npm.UpdatePackage(found);
 
-                IEnumerable<INpmPackageDependency>  outdated = npm.FindDependenciesToBeInstalled(found);
+                IEnumerable<INpmPackageDependency> outdated = npm.FindDependenciesToBeInstalled(found);
                 if (outdated != null && outdated.Count() > 0)
                 {
                     Console.WriteLine("Expected no outdated entry after update of {0}", module);
                     return false;
                 }
 
-                Console.WriteLine("Success! {0} is installed.", module);
+                npm.UninstallPackage(installedPkg.First());
+
+                Console.WriteLine("Success! {0} was installed and uninstalled.", module);
                 return true;
             }
             catch (NpmException ex)

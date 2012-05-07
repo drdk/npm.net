@@ -218,25 +218,7 @@ namespace NodeNpm
                 throw new ArgumentNullException("package");
             }
 
-            IEnumerable<INpmInstalledPackage> beforePackages = this.ApiClient.List();
-
-            // find package, and build path if needed
-            IEnumerable<INpmInstalledPackage> matchedList = beforePackages.Where(r => r.Name == package.Name).AsEnumerable();
-            if (matchedList == null || matchedList.Count() == 0)
-            {
-                return;
-            }
-
-            INpmInstalledPackage matched = matchedList.First();
-
-            if (!string.IsNullOrWhiteSpace(matched.DependentPath))
-            {
-                this.ApiClient.SetDependencyDirectory(matched.DependentPath);
-            }
-
-            bool uninstalled = this.ApiClient.Uninstall(package.Name);
-
-            this.ApiClient.SetDependencyDirectory(null);
+            this.ApiClient.Uninstall(package.Name);
         }
 
         /// <summary>
@@ -258,7 +240,7 @@ namespace NodeNpm
             // first update this package by name
             IEnumerable<INpmInstalledPackage> updatedList = this.ApiClient.Update(package.Name);
 
-            IEnumerable<INpmInstalledPackage> beforePackages = this.ApiClient.List();
+            IEnumerable<INpmInstalledPackage> beforePackages = this.ApiClient.ListChildren();
 
             // find package, and build path if needed
             IEnumerable<INpmInstalledPackage> matchedList = beforePackages.Where(r => r.Name == package.Name).AsEnumerable();
