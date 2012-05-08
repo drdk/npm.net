@@ -194,7 +194,32 @@ namespace NodeNpm
         /// <returns>INpmInstalledPackage or null</returns>
         public INpmInstalledPackage IsPackageInstalled(INpmPackage package)
         {
-            return this.ApiClient.TestInstalled(package);
+            IEnumerable<INpmInstalledPackage> children = this.ApiClient.ListChildren();
+            if (children != null && children.Count() > 0)
+            {
+                foreach (INpmInstalledPackage child in children)
+                {
+                    if (child.Name == package.Name && !child.IsMissing)
+                    {
+                        // if version specified, match version as well as name
+                        if (!string.IsNullOrWhiteSpace(package.Version))
+                        {
+                            if (child.Version == package.Version)
+                            {
+                                return child;
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+
+                        return child;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

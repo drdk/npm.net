@@ -180,7 +180,7 @@ namespace NpmUnitTests
                 this.lastExecuteOutput = MockTestData.List1Text();
                 return 0;
             }
-            if (wd.IndexOf("project2") > 0)
+            else if (wd.IndexOf("project2") > 0)
             {
                 this.lastExecuteOutput = MockTestData.List2Text();
                 return 0;

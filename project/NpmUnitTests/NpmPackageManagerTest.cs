@@ -342,6 +342,31 @@ namespace NpmUnitTests
         }
 
         /// <summary>
+        /// A test for IsPackageInstalled on grandchild - expect failure
+        /// </summary>
+        [TestMethod]
+        public void IsPackageInstalledFailTest()
+        {
+            string wd = "c:\\root\\project2";
+            Uri registry = null;
+            NpmFactory factory = new MockNpmFactory();
+            NpmPackageManager target = new NpmPackageManager(factory, wd, registry);
+            NpmPackage package = MockTestData.List1MatchInstalledPackage();
+            NpmInstalledPackage expected = null;
+            INpmInstalledPackage actual;
+            actual = target.IsPackageInstalled(package);
+            if (expected == null)
+            {
+                Assert.AreEqual(expected, actual);
+            }
+            else
+            {
+                Assert.IsNotNull(actual);
+                Assert.AreEqual(expected, actual, "item value differs");
+            }
+        }
+
+        /// <summary>
         /// A test for SearchRemotePackages
         /// </summary>
         [TestMethod]
