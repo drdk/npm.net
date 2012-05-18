@@ -22,62 +22,62 @@ namespace NodeNpm
         /// <summary>
         /// Directory name inserted for each dependency level
         /// </summary>
-        private const string ModuleDir = "node_modules";
+        protected const string ModuleDir = "node_modules";
 
         /// <summary>
         /// Directory name inserted for each dependency level
         /// </summary>
-        private const string ModuleSeparator = "/node_modules/";
+        protected const string ModuleSeparator = "/node_modules/";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string ParseErrorInstall = "Failed: unable to parse output from install command.";
+        protected const string ParseErrorInstall = "Failed: unable to parse output from install command.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string ConvertErrorInstall = "Failed: unable to convert output from install command to object.";
+        protected const string ConvertErrorInstall = "Failed: unable to convert output from install command to object.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string ParseErrorList = "Failed: unable to parse output from list command.";
+        protected const string ParseErrorList = "Failed: unable to parse output from list command.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string ConvertErrorList = "Failed: unable to convert output from list command to object.";
+        protected const string ConvertErrorList = "Failed: unable to convert output from list command to object.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string ParseErrorView = "Failed: unable to parse output from view command.";
+        protected const string ParseErrorView = "Failed: unable to parse output from view command.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string ConvertErrorView = "Failed: unable to convert output from view command to object.";
+        protected const string ConvertErrorView = "Failed: unable to convert output from view command to object.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string NpmReportedError = "Failed: npm reported an error.";
+        protected const string NpmReportedError = "Failed: npm reported an error.";
 
         /// <summary>
         /// Error message
         /// </summary>
-        private const string NpmErrorLineStart = "npm ERR! ";
+        protected const string NpmErrorLineStart = "npm ERR! ";
 
         /// <summary>
         /// Regular expression for parsing search output
         /// </summary>
-        private const string SearchPattern = @"^(\S+)\s+(.*)=(\S+)\s+([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2})\s*(.*)$";
+        protected const string SearchPattern = @"^(\S+)\s+(.*)=(\S+)\s+([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2})\s*(.*)$";
 
         /// <summary>
         /// Regular expression for combined json strings
         /// </summary>
-        private const string ConcatJsonPattern = @"\r\n}\s*{";
+        protected const string ConcatJsonPattern = @"\r\n}\s*{";
 
         /// <summary>
         /// Regular expression class for parsing search output
@@ -538,7 +538,7 @@ namespace NodeNpm
         /// </summary>
         /// <param name="package">INpmPackage to update</param>
         /// <param name="nameVersion">string name or name@version</param>
-        private static void FillPackageFromNameVersion(INpmPackage package, string nameVersion)
+        protected static void FillPackageFromNameVersion(INpmPackage package, string nameVersion)
         {
             if (nameVersion == null)
             {
@@ -568,7 +568,7 @@ namespace NodeNpm
         /// <param name="name">name of package</param>
         /// <param name="viewObj">dictionary at root of object</param>
         /// <returns>NpmRemotePackage instance</returns>
-        private static NpmRemotePackage RemotePackageFromDictionary(string name, Dictionary<string, object> viewObj)
+        protected static NpmRemotePackage RemotePackageFromDictionary(string name, Dictionary<string, object> viewObj)
         {
             NpmRemotePackage remote = new NpmRemotePackage();
             remote.Name = name;
@@ -656,7 +656,7 @@ namespace NodeNpm
         /// </summary>
         /// <param name="obj">object to convert</param>
         /// <returns>A List of strings</returns>
-        private static List<string> ConvertStringArray(object obj)
+        protected static List<string> ConvertStringArray(object obj)
         {
             List<string> strings = null;
             ArrayList array = obj as ArrayList;
@@ -689,7 +689,7 @@ namespace NodeNpm
         /// <param name="key">The string key of the dependency</param>
         /// <param name="value">The object value</param>
         /// <returns>A package dependency</returns>
-        private static NpmPackageDependency ConvertKeyValueToDependency(string key, object value)
+        protected static NpmPackageDependency ConvertKeyValueToDependency(string key, object value)
         {
             NpmPackageDependency dependency = new NpmPackageDependency();
             dependency.Name = key;
@@ -702,7 +702,7 @@ namespace NodeNpm
         /// </summary>
         /// <param name="obj">The parsed json object to convert</param>
         /// <returns>A List of package dependencies</returns>
-        private static List<NpmPackageDependency> ConvertDependencies(object obj)
+        protected static List<NpmPackageDependency> ConvertDependencies(object obj)
         {
             Dictionary<string, object> deps = obj as Dictionary<string, object>;
             if (deps != null)
@@ -725,7 +725,7 @@ namespace NodeNpm
         /// </summary>
         /// <param name="obj">The object to convert</param>
         /// <returns>A reference with type and url</returns>
-        private static NpmReference ConvertReference(object obj)
+        protected static NpmReference ConvertReference(object obj)
         {
             Dictionary<string, object> dictionary = obj as Dictionary<string, object>;
             if (dictionary != null)
@@ -752,7 +752,7 @@ namespace NodeNpm
         /// </summary>
         /// <param name="parent">Parent list for this object</param>
         /// <param name="child">Child object is dictionary from json deserialize</param>
-        private static void InstalledPackagesFromInstalledDictionary(
+        protected static void InstalledPackagesFromInstalledDictionary(
                                             List<INpmInstalledPackage> parent,
                                             object child)
         {
@@ -809,7 +809,7 @@ namespace NodeNpm
         /// <param name="dependentPath">list of parents delimited by "/"</param>
         /// <param name="listObj">dictionary at root of package</param>
         /// <remarks>This is called recursively as a dependency is a package</remarks>
-        private void InstalledPackageFromDictionary(
+        protected void InstalledPackageFromDictionary(
                                                     List<INpmInstalledPackage> parent,
                                                     string name,
                                                     string dependentPath,
@@ -868,6 +868,10 @@ namespace NodeNpm
                         }
                     }
                 }
+                else
+                {
+                    installed.HasDependencies = false;
+                }
             }
         }
 
@@ -877,7 +881,7 @@ namespace NodeNpm
         /// <param name="parent">Parent list for this object</param>
         /// <param name="dependentPath">list of parents delimited by "/"</param>
         /// <param name="listObj">dictionary at root of package</param>
-        private void InstalledDependenciesFromDictionary(
+        protected void InstalledDependenciesFromDictionary(
                                                     List<INpmInstalledPackage> parent,
                                                     string dependentPath,
                                                     Dictionary<string, object> listObj)
@@ -937,7 +941,7 @@ namespace NodeNpm
         /// <param name="listObj">dictionary at root of package</param>
         /// <returns>Installed package object</returns>
         /// <remarks>This is called recursively as a dependency is a package</remarks>
-        private NpmInstalledPackage MatchPackageFromDictionary(
+        protected NpmInstalledPackage MatchPackageFromDictionary(
                                                     INpmPackage package,
                                                     string name,
                                                     string dependentPath,

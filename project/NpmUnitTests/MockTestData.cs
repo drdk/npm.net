@@ -18,10 +18,10 @@ namespace NpmUnitTests
     internal static class MockTestData
     {
         /// <summary>
-        /// Npm text output for install
+        /// Npm text output for install - old style (pre 1.1.16)
         /// </summary>
         /// <returns>Predictable output text for install test</returns>
-        public static string Install1Text()
+        public static string InstallOld1Text()
         {
             return
                 "{\n" +
@@ -33,6 +33,23 @@ namespace NpmUnitTests
                 "    \"from\": \"underscore\"\n" +
                 "  }\n" +
                 "}\n";
+        }
+
+        /// <summary>
+        /// Npm text output for install
+        /// </summary>
+        /// <returns>Predictable output text for install test</returns>
+        public static string Install1Text()
+        {
+            return
+                "[\n" +
+                "  {\n" +
+                "    \"name\": \"underscore\",\n" +
+                "    \"version\": \"1.3.3\",\n" +
+                "    \"from\": \"underscore\",\n" +
+                "    \"dependencies\": {}\n" +
+                "  }\n" +
+                "]\n";
         }
 
         /// <summary>
@@ -612,7 +629,7 @@ namespace NpmUnitTests
         /// <returns>Predictable output text for version test</returns>
         public static string Version1Text()
         {
-            return "1.1.9\n\n";
+            return "1.1.20\n\n";
         }
 
         /// <summary>
@@ -621,7 +638,7 @@ namespace NpmUnitTests
         /// <returns>Expected result for version test</returns>
         public static string Version1Expected()
         {
-            return "1.1.9";
+            return "1.1.20";
         }
 
         /// <summary>

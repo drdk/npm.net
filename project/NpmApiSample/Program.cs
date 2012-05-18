@@ -39,6 +39,7 @@ namespace NpmApiSample
             string searchTerm = DefSearchTerm;
             bool runApiSample = true;
             bool runPackageManagerSample = true;
+            bool runManualPackageManagerSample = true;
 
             for (int i = 0; i < args.Count(); i++)
             {
@@ -62,11 +63,19 @@ namespace NpmApiSample
                 {
                     runApiSample = true;
                     runPackageManagerSample = false;
+                    runManualPackageManagerSample = false;
                 }
                 else if (args[i] == "-p")
                 {
                     runApiSample = false;
                     runPackageManagerSample = true;
+                    runManualPackageManagerSample = false;
+                }
+                else if (args[i] == "-m")
+                {
+                    runApiSample = false;
+                    runPackageManagerSample = false;
+                    runManualPackageManagerSample = true;
                 }
                 else if (args[i] == "-?")
                 {
@@ -86,6 +95,11 @@ namespace NpmApiSample
             if (runPackageManagerSample)
             {
                 PackageManagerSample.RunSample(wd, installPath, searchTerm);
+            }
+
+            if (runManualPackageManagerSample)
+            {
+                ManualPmSample.RunSample(wd, installPath, searchTerm);
             }
         }
     }

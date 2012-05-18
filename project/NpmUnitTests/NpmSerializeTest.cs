@@ -79,6 +79,18 @@ namespace NpmUnitTests
         {
             NpmSerialize target = new NpmSerialize();
             Assert.IsNotNull(target);
+            NpmSerialize_v2 target2 = new NpmSerialize_v2();
+            Assert.IsNotNull(target2);
+        }
+
+        /// <summary>
+        /// A test for NpmSerialize Constructor
+        /// </summary>
+        [TestMethod]
+        public void NpmSerializeFactoryConstructorTest()
+        {
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
+            Assert.IsNotNull(target);
         }
 
         /// <summary>
@@ -88,7 +100,7 @@ namespace NpmUnitTests
         public void FromInstallTest()
         {
             IEnumerable<INpmInstalledPackage> actual;
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string output = MockTestData.Install1Text();
             List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
@@ -110,7 +122,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListInstalledTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.List1Text();
             List<NpmInstalledPackage> expected = MockTestData.List1Expected();
@@ -133,7 +145,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListInstalled2Test()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.List2Text();
             List<NpmInstalledPackage> expected = MockTestData.List2Expected();
@@ -156,7 +168,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListInstalledProblemTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.ListProblems1Text();
             List<NpmInstalledPackage> expected = MockTestData.ListProblem1Expected();
@@ -179,7 +191,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListMatchInstalledTest1()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.List1Text();
             NpmPackage package = MockTestData.List1MatchInstalledPackage();
@@ -204,7 +216,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListMatchInstalledTest2()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.List1Text();
             NpmPackage package = MockTestData.List2MatchInstalledPackage();
@@ -229,7 +241,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListInstalledChildrenTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.List1Text();
             List<NpmInstalledPackage> expected = MockTestData.List1ChildrenExpected();
@@ -252,7 +264,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListInstalledChildren2Test()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.List2Text();
             List<NpmInstalledPackage> expected = MockTestData.List2ChildrenExpected();
@@ -275,7 +287,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromOutdatedDependencyTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string outdated = MockTestData.Outdated1Text();
             List<NpmPackageDependency> expected = MockTestData.Outdated1Expected();
@@ -298,7 +310,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromSearchResultTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
             string output = MockTestData.SearchResult1Text();
             List<NpmSearchResultPackage> expected = MockTestData.SearchResult1Expected();
 
@@ -320,7 +332,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromViewTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonview = MockTestData.View1Text();
             NpmRemotePackage expected = MockTestData.View1Expected();
@@ -335,7 +347,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void FromListEmptyTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string jsonlist = MockTestData.ListEmptyText();
             List<NpmInstalledPackage> expected = MockTestData.ListEmptyExpected();
@@ -358,7 +370,7 @@ namespace NpmUnitTests
         [TestMethod]
         public void ExceptionFromErrorTest()
         {
-            NpmSerialize target = new NpmSerialize();
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
 
             string errorText = MockTestData.ErrorInstallText();
             NpmException expected = MockTestData.ErrorInstallExpected();
@@ -381,6 +393,29 @@ namespace NpmUnitTests
             Assert.AreEqual(expected.NpmArguments, actual.NpmArguments);
             Assert.AreEqual(expected.NpmCwd, actual.NpmCwd);
             Assert.AreEqual(expected.NpmVerbose, actual.NpmVerbose);
+        }
+
+        /// <summary>
+        /// A test for FromInstall for older versions
+        /// </summary>
+        [TestMethod]
+        public void FromInstallOld1Test()
+        {
+            IEnumerable<INpmInstalledPackage> actual;
+            INpmSerialize target = new MockNpmFactory().GetSerialize("1.1.9");
+
+            string output = MockTestData.InstallOld1Text();
+            List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
+
+            actual = target.FromInstall(output);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
         }
     }
 }

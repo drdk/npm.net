@@ -32,7 +32,7 @@ namespace NpmApiSample
                 NpmPackageManager npm = new NpmPackageManager(wd);
                 if (npm == null)
                 {
-                    Console.WriteLine("Failed to create NpmApi");
+                    Console.WriteLine("Failed to create NpmPackageManager");
                     return false;
                 }
 

@@ -68,8 +68,10 @@
     <Compile Include="NpmRemotePackage.cs" />
     <Compile Include="NpmSearchResultPackage.cs" />
     <Compile Include="utils\NpmSerialize.cs" />
+    <Compile Include="utils\NpmSerialize_v2.cs" />
     <Compile Include="utils\NpmSync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="utils\SemVer.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

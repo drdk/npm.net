@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiSample.cs" />
+    <Compile Include="ManualPmSample.cs" />
     <Compile Include="PackageManagerSample.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

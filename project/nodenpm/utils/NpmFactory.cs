@@ -33,7 +33,26 @@ namespace NodeNpm
         /// <returns>INpmSerialize instance</returns>
         public virtual INpmSerialize GetSerialize(string version)
         {
-            return new NpmSerialize();
+            SemVer ver;
+            if (version == null)
+            {
+                // return latest
+                return new NpmSerialize_v2();
+            }
+            else
+            {
+                ver = SemVer.Parse(version);
+            }
+
+            // Data output for install changed in 1.1.14
+            if (ver.CompareTo(new SemVer(1, 1, 14)) >= 0)
+            {
+                return new NpmSerialize_v2();
+            }
+            else
+            {
+                return new NpmSerialize();
+            }
         }
     }
 }
