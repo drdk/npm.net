@@ -28,6 +28,14 @@ namespace NodeNpm
         {
             string wrapOutput;
 
+            // sometimes the output has some text lines pre-pended, look for the first
+            // json delimiter
+            int firstDelimiter = output.IndexOfAny(new char[] { '[', '{' });
+            if (firstDelimiter > 0)
+            {
+                output = output.Substring(firstDelimiter);
+            }
+
             if (output[0] == '[')
             {
                 // returns array without being wrapped in object.

@@ -53,6 +53,24 @@ namespace NpmUnitTests
         }
 
         /// <summary>
+        /// Npm text output for install -- with prepended lines
+        /// </summary>
+        /// <returns>Predictable output text for install test</returns>
+        public static string InstallWithPrependedText()
+        {
+            return
+                "foo bar\n" +
+                "[\n" +
+                "  {\n" +
+                "    \"name\": \"underscore\",\n" +
+                "    \"version\": \"1.3.3\",\n" +
+                "    \"from\": \"underscore\",\n" +
+                "    \"dependencies\": {}\n" +
+                "  }\n" +
+                "]\n";
+        }
+
+        /// <summary>
         /// Expected output from install
         /// </summary>
         /// <returns>Expected result for install test</returns>

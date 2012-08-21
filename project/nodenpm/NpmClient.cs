@@ -254,6 +254,10 @@ namespace NodeNpm
                 nodeNpm.StartInfo.WorkingDirectory = this.WorkingDirectory;
                 nodeNpm.StartInfo.CreateNoWindow = true;
 
+                // force colorization off, this will prevent escape characters from showing up
+                // in the output we need to parse
+                nodeNpm.StartInfo.EnvironmentVariables.Add("npm_config_color", "false");
+
                 // It is not safe to read output and error synchronously
                 sync = NpmSync.AddNpmSync(nodeNpm);
                 nodeNpm.OutputDataReceived += new DataReceivedEventHandler(StandardOutputHandler);

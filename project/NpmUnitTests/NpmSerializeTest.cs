@@ -117,6 +117,29 @@ namespace NpmUnitTests
         }
 
         /// <summary>
+        /// A test for FromInstall
+        /// </summary>
+        [TestMethod]
+        public void FromInstallWithPrependedTextTest()
+        {
+            IEnumerable<INpmInstalledPackage> actual;
+            INpmSerialize target = new MockNpmFactory().GetSerialize(null);
+
+            string output = MockTestData.InstallWithPrependedText();
+            List<NpmInstalledPackage> expected = MockTestData.Install1Expected();
+
+            actual = target.FromInstall(output);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Count, actual.Count());
+            int index = 0;
+            foreach (NpmInstalledPackage actualItem in actual)
+            {
+                Assert.AreEqual(expected[index], actualItem, "item value differs");
+                index++;
+            }
+        }
+
+        /// <summary>
         /// A test for FromListInstalled
         /// </summary>
         [TestMethod]
