@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoNpmFactory.cs" />
     <Compile Include="interfaces\INpmApi.cs" />
     <Compile Include="interfaces\INpmClient.cs" />
     <Compile Include="interfaces\INpmPackage.cs" />

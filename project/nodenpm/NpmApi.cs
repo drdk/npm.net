@@ -274,6 +274,28 @@ namespace NodeNpm
         }
 
         /// <summary>
+        /// Install all npm packages from package.json in working directory. Wraps 'npm install'
+        /// </summary>
+        /// <returns>enumerable list of packages</returns>
+        public IEnumerable<INpmInstalledPackage> Install()
+        {
+            int rc = this.Client.Execute("install", "--json");
+            if (rc == 0)
+            {
+                string output = this.Client.LastExecuteOutput;
+                return this.Serializer.FromInstall(output);
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.Client.LastExecuteErrorText))
+            {
+                throw this.Serializer.ExceptionFromError(this.Client.LastExecuteErrorText);
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
         /// Get outdated or missing dependencies. Wraps 'npm outdated'
         /// </summary>
         /// <returns>enumerable set of packages needing updates</returns>
