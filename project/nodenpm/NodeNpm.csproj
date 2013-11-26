@@ -58,6 +58,7 @@
     <Compile Include="interfaces\INpmPackage.cs" />
     <Compile Include="interfaces\INpmPackageManager.cs" />
     <Compile Include="interfaces\INpmSerialize.cs" />
+    <Compile Include="Npm.cs" />
     <Compile Include="NpmApi.cs" />
     <Compile Include="NpmClient.cs" />
     <Compile Include="NpmException.cs" />
