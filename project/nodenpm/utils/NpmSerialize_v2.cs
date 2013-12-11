@@ -17,6 +17,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Text.RegularExpressions;
+
 namespace NodeNpm
 {
     using System;
@@ -43,7 +45,10 @@ namespace NodeNpm
 
             // sometimes the output has some text lines pre-pended, look for the first
             // json delimiter
-            int firstDelimiter = output.IndexOfAny(new char[] { '[', '{' });
+            var regex = new Regex(@"\[\s*\{");
+            Match m = regex.Match(output);
+            
+            int firstDelimiter = m.Index; output.IndexOfAny(new char[] { '[', '{' });
             if (firstDelimiter > 0)
             {
                 output = output.Substring(firstDelimiter);
