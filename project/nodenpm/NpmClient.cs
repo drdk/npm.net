@@ -139,6 +139,8 @@ namespace NodeNpm
             set;
         }
 
+        public string NpmCacheDirectory { get; set; }
+
         /// <summary>
         /// Gets or sets URL of remote registry. Only set if not using default NPM.
         /// </summary>
@@ -234,6 +236,11 @@ namespace NodeNpm
 
             using (Process nodeNpm = new Process())
             {
+                if (!string.IsNullOrWhiteSpace(NpmCacheDirectory))
+                {
+                    nodeNpm.StartInfo.EnvironmentVariables["npm_config_cache"] = NpmCacheDirectory;
+                }
+
                 NpmSync sync;
                 nodeNpm.StartInfo.RedirectStandardError = true;
                 nodeNpm.StartInfo.RedirectStandardOutput = true;

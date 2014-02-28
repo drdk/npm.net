@@ -43,6 +43,8 @@ namespace NodeNpm
         /// </summary>
         string WorkingDirectory { get; set; }
 
+        string NpmCacheDirectory { get; set; }
+
         /// <summary>
         /// Gets or sets URI of remote registry. Only set if not using default NPM.
         /// </summary>
