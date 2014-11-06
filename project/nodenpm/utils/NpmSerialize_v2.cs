@@ -54,7 +54,7 @@ namespace NodeNpm
                 output = output.Substring(firstDelimiter);
             }
 
-            if (output.EndsWith("[]"))
+            if (output.TrimEnd().EndsWith("[]"))
             {
                 wrapOutput = "{ INSTALLROOT: [] }";
             }
