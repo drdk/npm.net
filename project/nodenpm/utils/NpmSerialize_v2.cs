@@ -54,7 +54,11 @@ namespace NodeNpm
                 output = output.Substring(firstDelimiter);
             }
 
-            if (output[0] == '[')
+            if (output.EndsWith("[]"))
+            {
+                wrapOutput = "{ INSTALLROOT: [] }";
+            }
+            else if (output[0] == '[')
             {
                 // returns array without being wrapped in object.
                 // wrap this in an object to allow json parser to work

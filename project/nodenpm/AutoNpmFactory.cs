@@ -21,11 +21,17 @@ namespace npm_grunt
         {
             var npmExecutable = FindExePath("node.exe");
             var path = Path.GetDirectoryName(npmExecutable);
-            return new NpmClient()
-                {
-                    InstallPath = path,
-                    NpmCacheDirectory = _npmCacheDirectory
-                };
+            var npmClient = new NpmClient()
+            {
+                InstallPath = path
+            };
+
+            if (_npmCacheDirectory != null)
+            {
+                npmClient.NpmCacheDirectory = _npmCacheDirectory;
+            }
+
+            return npmClient;
         }
 
         private string FindExePath(string exe)

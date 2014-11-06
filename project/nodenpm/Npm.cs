@@ -8,7 +8,7 @@ namespace NodeNpm
 {
     public static class NpmPackageSearch
     {
-        public static IEnumerable<NpmApi> FindNpmApis(string workingDirectory, string npmCacheDirectory)
+        public static IEnumerable<NpmApi> FindNpmApis(string workingDirectory, string npmCacheDirectory = null)
         {
             const string fileToFind = "package.json";
             var skipIn = new[] { "node_modules", "bower_components" };
