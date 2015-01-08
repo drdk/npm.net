@@ -531,7 +531,7 @@ namespace NodeNpm
                 return null;
             }
 
-            NpmException exception = new NpmException(NpmReportedError);
+            NpmException exception = new NpmException(output);
             string[] errorLines = output.Split('\n');
 
             foreach (string line in errorLines)
